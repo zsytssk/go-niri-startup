@@ -7,39 +7,44 @@ type Event struct {
 	Counter   int
 }
 
-func (state *Event) OnEvent(eventName string, fn func(interface{})) {
-	state.Counter++
-	id := fmt.Sprintf("%s_%d", eventName, state.Counter)
-	state.Listeners[eventName] = append(state.Listeners[eventName], Listener{
+func (e *Event) OnEvent(eventName string, fn func(interface{})) func() {
+	e.Counter++
+	id := fmt.Sprintf("%s_%d", eventName, e.Counter)
+	listener := Listener{
 		id,
 		fn,
-	})
+	}
+	e.Listeners[eventName] = append(e.Listeners[eventName], listener)
+
+	return func() {
+		e.OffEvent(eventName, listener)
+	}
 }
 
-func (state *Event) OnceEvent(eventName string, fn func(interface{})) {
+func (e *Event) OnceEvent(eventName string, fn func(interface{})) {
 	var listener Listener
 	listener = Listener{
-		fmt.Sprintf("%s_%d", eventName, state.Counter),
+		fmt.Sprintf("%s_%d", eventName, e.Counter),
 		func(val interface{}) {
 			fn(val)
-			state.OffEvent(eventName, listener)
+			e.OffEvent(eventName, listener)
 		},
 	}
-	state.Listeners[eventName] = append(state.Listeners[eventName], listener)
+	e.Listeners[eventName] = append(e.Listeners[eventName], listener)
 }
 
-func (state *Event) OffEvent(eventName string, fn Listener) {
+func (e *Event) OffEvent(eventName string, fn Listener) {
 	index := -1
-	for i, item := range state.Listeners[eventName] {
+	for i, item := range e.Listeners[eventName] {
 		if item.Id == fn.Id {
 			index = i
 		}
 	}
-	state.Listeners[eventName] = append(state.Listeners[eventName][:index], state.Listeners[eventName][index+1:]...)
+	e.Listeners[eventName] = append(e.Listeners[eventName][:index], e.Listeners[eventName][index+1:]...)
 }
 
-func (state *Event) TriggerEvent(eventName string, data interface{}) {
-	for _, item := range state.Listeners[eventName] {
+func (e *Event) TriggerEvent(eventName string, data interface{}) {
+	for _, item := range e.Listeners[eventName] {
 		item.Fn(data)
 	}
 }

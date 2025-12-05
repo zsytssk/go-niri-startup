@@ -5,7 +5,7 @@ type FocusTimestamp struct {
 	Nanos int `json:"nanos"`
 }
 
-type Layout struct {
+type WindowLayout struct {
 	PosInScrollingLayout   [2]int     `json:"pos_in_scrolling_layout"`
 	TileSize               [2]float64 `json:"tile_size"`
 	WindowSize             [2]int     `json:"window_size"`
@@ -16,12 +16,12 @@ type Layout struct {
 type Window struct {
 	ID             int            `json:"id"`
 	Title          string         `json:"title"`
-	AppID          string         `json:"app_id"`
+	AppId          string         `json:"app_id"`
 	PID            int            `json:"pid"`
 	WorkspaceID    int            `json:"workspace_id"`
 	IsFocused      bool           `json:"is_focused"`
 	IsFloating     bool           `json:"is_floating"`
 	IsUrgent       bool           `json:"is_urgent"`
-	Layout         Layout         `json:"layout"`
+	Layout         WindowLayout   `json:"layout"`
 	FocusTimestamp FocusTimestamp `json:"focus_timestamp"`
 }

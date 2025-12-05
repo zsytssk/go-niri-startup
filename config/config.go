@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"path"
 	"path/filepath"
@@ -45,4 +46,16 @@ func GetConfig() (Config, error) {
 		return *config, err
 	}
 	return *config, err
+}
+
+func GetSpadConfig(name string) (*Spad, error) {
+	config, err := GetConfig()
+	if err != nil {
+		return nil, err
+	}
+	cur, ok := config.SpadMap[name]
+	if !ok {
+		return nil, fmt.Errorf("can't find spad config name %s", name)
+	}
+	return &cur, nil
 }

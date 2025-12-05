@@ -5,7 +5,10 @@ import (
 	"fmt"
 	"net/http"
 	"niri-startup/command"
+	"niri-startup/command/action"
+	"niri-startup/command/spad"
 	"niri-startup/config"
+	"niri-startup/state"
 	"niri-startup/utils"
 	"os"
 )
@@ -17,7 +20,7 @@ func getCmd() []string {
 	return os.Args[1:]
 }
 
-const port = 6322
+const PORT = 6322
 
 func main() {
 	// 处理命令行参数
@@ -27,22 +30,23 @@ func main() {
 		http.Post(fmt.Sprintf("http://127.0.0.1:6322/%s", name), "application/json", bytes.NewBuffer([]byte(data)))
 		return
 	}
-	fmt.Println(args)
-
 	// 处理本地服务器
-	if !utils.IsPortAvailable(port) {
-		panic(fmt.Sprintf("端口 %d 已被占用", port))
+	if !utils.IsPortAvailable(PORT) {
+		panic(fmt.Sprintf("端口 %d 已被占用", PORT))
 	}
 	_, err := config.GetConfig()
 	if err != nil {
 		panic(err)
 	}
-	http.HandleFunc("/spad", command.Spad)
-	http.HandleFunc("/action", command.Action)
+	state.GetStateInstance()
+	utils.GetSocketInstance()
+
+	http.HandleFunc("/spad", spad.Spad)
+	http.HandleFunc("/action", action.Action)
 	http.HandleFunc("/runApp", command.RunApp)
-	err = http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
+	http.HandleFunc("/getState", command.GetState)
+	err = http.ListenAndServe(fmt.Sprintf(":%d", PORT), nil)
 	if err != nil {
 		panic(err)
 	}
-
 }
