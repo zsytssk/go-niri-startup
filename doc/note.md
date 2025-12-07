@@ -21,11 +21,18 @@
   - 本地服务器
   - 读取配置
 
+- @ques client.send 能不能使用队列 一个个的发送命令
+
+  - curOutput | nextOutput -> 可能是 CurrentWorkspaceId 不对
+  - 可能是 从 socket 返回的数据出了问题 ->
+
 - @ques go setTimeout
 
 - @ques 如何申请两个 socket
 
 - @ques 内存使用 对比 js 版本
+
+- @ques SwitchScreen workspace 没有转换 + 当前 index 错误， 卡住无法继续
 
 - @opt 有些地方是`&item` 有些地方是`item` 能不能统一
 

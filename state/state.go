@@ -37,6 +37,7 @@ func (s *State) BindEventStream(client *utils.Client) {
 			switch msgType {
 			case "WorkspacesChanged":
 				{
+					s.Workspaces = make(map[int]Workspace, 0)
 					s.outputsChange(data.WorkspacesChanged.Workspaces)
 					for _, m := range data.WorkspacesChanged.Workspaces {
 						s.addWorkspace(m)
@@ -53,6 +54,7 @@ func (s *State) BindEventStream(client *utils.Client) {
 				}
 			case "WindowsChanged":
 				{
+					s.Windows = make(map[int]Window, 0)
 					wins := data.WindowsChanged.Windows
 					for _, wi := range wins {
 						s.addWindow(wi)
