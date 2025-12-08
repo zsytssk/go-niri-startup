@@ -132,6 +132,25 @@ select {
     }
 ```
 
+```go
+scanner := bufio.NewScanner(c.conn)
+for scanner.Scan() {
+  c.Message <- scanner.Bytes()
+}
+
+// 代替
+
+reader := bufio.NewReader(c.conn)
+for {
+  line, err := reader.ReadBytes('\n')
+  if err != nil { // 远端断开或 socket 被关闭
+    _ = c.conn.Close()
+    return
+  }
+  c.Message <- line
+}
+```
+
 - @ques state 如何向外面分发事件 -> channel?
 
 - @opt event 使用 enum

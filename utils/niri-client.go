@@ -13,8 +13,8 @@ type Client struct {
 	name       string
 	socketPath string
 	conn       net.Conn
-	quit       chan struct{}
-	Connected  chan struct{}
+	quit       chan int
+	Connected  chan int
 	Message    chan []byte
 }
 
@@ -27,8 +27,8 @@ func NewClient(name string) *Client {
 	return &Client{
 		name:       name,
 		socketPath: socket,
-		quit:       make(chan struct{}),
-		Connected:  make(chan struct{}),
+		quit:       make(chan int),
+		Connected:  make(chan int),
 		Message:    make(chan []byte, 10),
 	}
 }
@@ -63,20 +63,29 @@ func (c *Client) Connect() {
 }
 
 func (c *Client) handleConnection() {
-	reader := bufio.NewReader(c.conn)
 
 	select {
-	case c.Connected <- struct{}{}:
+	case c.Connected <- 1:
 	default:
 	}
+	// defer func() { _ = c.conn.Close() }()
+	// scanner := bufio.NewScanner(c.conn)
+	// for scanner.Scan() {
+	// 	c.Message <- scanner.Bytes()
+	// }
 
+	reader := bufio.NewReader(c.conn)
 	for {
 		line, err := reader.ReadBytes('\n')
 		if err != nil { // 远端断开或 socket 被关闭
 			_ = c.conn.Close()
-			return
+			break
 		}
-		c.Message <- line
+		select {
+		case c.Message <- line:
+		default:
+		}
+
 	}
 }
 
@@ -86,16 +95,17 @@ func (c *Client) Send(msg interface{}) error {
 	}
 	str, err := json.Marshal(msg)
 	if err != nil {
-		panic("")
+		return err
 	}
 
-	fmt.Println(`test:>send`, string(str))
+	// fmt.Println(`test:>send`, string(str))
 	_, err = fmt.Fprintf(c.conn, "%s\n", str)
 	if err != nil {
 		return err
 	}
-	str1 := <-c.Message
-	fmt.Println(`test:>resp`, string(str1))
+	<-c.Message
+	// str1 := <-c.Message
+	// fmt.Println(`test:>resp`, string(str1))
 	return err
 
 	// _, err = fmt.Fprintf(c.conn, "%s\n", str)
