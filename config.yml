@@ -1,0 +1,12 @@
+spadMap:
+  term:
+    cmd: 'ghostty --title="TermSpad" --class="TermSpad.ghostty"'
+    appId: "TermSpad.ghostty"
+    height: 900
+    width: 1200
+
+  chatgpt:
+    cmd: 'google-chrome-stable --app-id="cadlkienfkclaiaibeoongdcgmdikeeg"'
+    appId: "chrome-cadlkienfkclaiaibeoongdcgmdikeeg-Default"
+    height: 900
+    width: 1200
