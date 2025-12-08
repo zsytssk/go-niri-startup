@@ -88,14 +88,51 @@ func (c *Client) Send(msg interface{}) error {
 	if err != nil {
 		panic("")
 	}
-	// fmt.Println(string(str))
-	_, err = c.conn.Write([]byte(string(str) + "\n"))
+
+	fmt.Println(`test:>send`, string(str))
+	_, err = fmt.Fprintf(c.conn, "%s\n", str)
+	if err != nil {
+		return err
+	}
+	str1 := <-c.Message
+	fmt.Println(`test:>resp`, string(str1))
+	return err
+
+	// _, err = fmt.Fprintf(c.conn, "%s\n", str)
+	// if err != nil {
+	// 	return err
+	// }
+
+	// _, err = c.conn.Write([]byte(string(str) + "\n"))
+	// if err != nil {
+	// 	return err
+	// }
+	// _, err = bufio.NewReader(c.conn).ReadString('\n')
+	// if err != nil {
+	// 	return err
+	// }
+
+	// return err
+
+	// writer := bufio.NewWriter(c.conn) // 包装 conn
+	// _, err = writer.Write([]byte(string(str) + "\n"))
+	// if err != nil {
+	// 	return err
+	// }
+	// err = writer.Flush()
+	// time.Sleep(10 * time.Millisecond)
+	// return err
+
+	// _, err = c.conn.Write([]byte(string(str) + "\r\n"))
+	// c.conn.Flush()
+	// return err
+	// ---
 	// _, err = c.conn.Write(str)
 	// if err != nil {
 	// 	return err
 	// }
 	// _, err = c.conn.Write([]byte("\n"))
-	return err
+	// return err
 }
 
 func (c *Client) Stop() {

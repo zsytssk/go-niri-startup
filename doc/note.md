@@ -1,7 +1,21 @@
 ## 2025-12-06 15:16:20
 
 - @bug
+
   - CurrentWorkspaceId 不对
+
+- @ques 写入卡死，能正常读取
+  - 解决思路
+    - 写入使用队列
+    - isSwitch 跨线程
+
+```
+在单协程中多次发送命令
+n,err:=c.conn.Write([]byte(string(str) + "\r\n"))
+能正常返回n，但是服务器没有反应了，有什么办法解决这个问题？
+
+(这时候还是可以正常的读取服务器消息 - 这是另一个socket连接数据)
+```
 
 ## 2025-12-04 08:49:42
 
@@ -25,6 +39,8 @@
 
   - curOutput | nextOutput -> 可能是 CurrentWorkspaceId 不对
   - 可能是 从 socket 返回的数据出了问题 ->
+    - 同时写入太多数据导致卡死了， 而且数据是 byte 格式，解析出问题了
+  - 可能无法发送命令给 niri
 
 - @ques go setTimeout
 
@@ -164,4 +180,36 @@ func SwitchScreen(changeSpace int) {
 	isSwitch = true
 }
 
+```
+
+- 消息队列
+
+```go
+
+type Msg struct {
+    key int
+    val string
+    reply chan string
+}
+
+var ch = make(chan Msg)
+
+func init() {
+    go func() {
+        m := map[int]string{}
+        for msg := range ch {
+            if msg.val != "" {
+                m[msg.key] = msg.val
+            }
+            msg.reply <- m[msg.key]
+        }
+    }()
+}
+
+func RunApp(w http.ResponseWriter, r *http.Request) {
+    reply := make(chan string)
+    ch <- Msg{1, "hello", reply}
+    v := <-reply
+    fmt.Println(v)
+}
 ```

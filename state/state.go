@@ -34,6 +34,7 @@ func (s *State) BindEventStream(client *utils.Client) {
 			var data Msg
 			json.Unmarshal(msg, &data)
 			s.TriggerEvent(msgType, data)
+			// fmt.Println(`test:>msg`, msgType, string(msg))
 			switch msgType {
 			case "WorkspacesChanged":
 				{
@@ -59,7 +60,6 @@ func (s *State) BindEventStream(client *utils.Client) {
 					for _, wi := range wins {
 						s.addWindow(wi)
 					}
-
 				}
 			case "WindowClosed":
 				{

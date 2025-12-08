@@ -53,9 +53,9 @@ func Action(w http.ResponseWriter, r *http.Request) {
 	case "switch-screen-next":
 		SwitchScreen(1)
 	case "pick-color":
-		// todo
+		PickColor()
 	case "reset-state":
-		// todo
+		ResetState()
 	}
 
 	if err != nil {

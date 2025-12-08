@@ -1,7 +1,6 @@
 package action
 
 import (
-	"fmt"
 	"niri-startup/state"
 	"niri-startup/utils"
 	"slices"
@@ -44,7 +43,6 @@ func SwitchScreen(changeSpace int) {
 		}
 	}
 
-	fmt.Println(`test:>1`, len(curOutputWorkspaces), len(nextOutputWorkspaces))
 	slices.SortFunc(curOutputWorkspaces, func(a, b state.Workspace) int {
 		return a.Idx - b.Idx
 	})
