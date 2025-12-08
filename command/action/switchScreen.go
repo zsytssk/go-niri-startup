@@ -50,14 +50,16 @@ func SwitchScreen(changeSpace int) {
 		return a.Idx - b.Idx
 	})
 
-	for _, workspace := range append(curOutputWorkspaces, nextOutputWorkspaces...) {
+	moveActions := []utils.Action{}
+	focusActions := []utils.Action{}
+	for _, workspace := range append(nextOutputWorkspaces, curOutputWorkspaces...) {
 		var goOutput string
 		if workspace.Output == curOutput {
 			goOutput = nextOutput
 		} else {
 			goOutput = curOutput
 		}
-		actions := []utils.Action{
+		moveActions = append(moveActions, []utils.Action{
 			{
 				MoveWorkspaceToMonitor: &utils.MoveWorkspaceToMonitor{
 					Output: goOutput,
@@ -74,29 +76,27 @@ func SwitchScreen(changeSpace int) {
 					},
 				},
 			},
-		}
-		utils.NiriSendActionArr(actions)
-	}
-
-	for _, workspace := range append(curOutputWorkspaces, nextOutputWorkspaces...) {
-		actions := []utils.Action{}
+		}...)
 		if workspace.IsFocused {
-			actions = append(actions, utils.Action{FocusWorkspace: &utils.FocusWorkspace{
-				Reference: utils.WindowReference{
-					Id: workspace.ID,
+			focusActions = append(focusActions, utils.Action{
+				FocusWorkspace: &utils.FocusWorkspace{
+					Reference: utils.WindowReference{
+						Id: workspace.ID,
+					},
 				},
-			}})
+			})
 		} else if workspace.IsActive {
-			actions = append([]utils.Action{
+			focusActions = append([]utils.Action{
 				{FocusWorkspace: &utils.FocusWorkspace{
 					Reference: utils.WindowReference{
 						Id: workspace.ID,
 					},
 				}},
-			}, actions...)
+			}, focusActions...)
 		}
-		utils.NiriSendActionArr(actions)
 	}
-	// fmt.Println(`test:>2`, curOutput, nextOutput)
+	utils.NiriSendActionArr(moveActions)
+	utils.NiriSendActionArr(focusActions)
+
 	isSwitch = false
 }
