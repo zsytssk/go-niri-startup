@@ -86,13 +86,11 @@ func SwitchScreen(changeSpace int) {
 				},
 			})
 		} else if workspace.IsActive {
-			focusActions = append([]utils.Action{
-				{FocusWorkspace: &utils.FocusWorkspace{
-					Reference: utils.WindowReference{
-						Id: workspace.ID,
-					},
-				}},
-			}, focusActions...)
+			moveActions = append(moveActions, utils.Action{FocusWorkspace: &utils.FocusWorkspace{
+				Reference: utils.WindowReference{
+					Id: workspace.ID,
+				},
+			}})
 		}
 	}
 	utils.NiriSendActionArr(moveActions)
