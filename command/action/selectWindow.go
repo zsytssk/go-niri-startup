@@ -5,7 +5,6 @@ import (
 	"niri-startup/state"
 	"niri-startup/utils"
 	"slices"
-	"sort"
 	"strconv"
 	"strings"
 )
@@ -43,12 +42,16 @@ func SelectWindow() error {
 			Idx:       w.Layout.PosInScrollingLayout[0],
 		})
 	}
-	sort.Slice(wins, func(i, j int) bool {
-		a := wins[i]
-		b := wins[j]
-		return a.Output < b.Output || a.Workspace < b.Workspace || a.Idx < b.Idx
+	slices.SortFunc(wins, func(a, b WindowInfo) int {
+		if a.OutputIdx != b.OutputIdx {
+			return a.OutputIdx - b.OutputIdx
+		}
+		if a.Workspace != b.Workspace {
+			return a.Workspace - b.Workspace
+		}
+		return a.Idx - b.Idx
 	})
-
+	fmt.Println(wins)
 	var lines []string
 	for i, item := range wins {
 		lines = append(lines,

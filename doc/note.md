@@ -1,31 +1,16 @@
 ## 2025-12-06 15:16:20
 
-- @bug
-
-  - CurrentWorkspaceId 不对
-
-- @ques 写入卡死，能正常读取
-  - 解决思路
-    - 写入使用队列
-    - isSwitch 跨线程
-
-```
-在单协程中多次发送命令
-n,err:=c.conn.Write([]byte(string(str) + "\r\n"))
-能正常返回n，但是服务器没有反应了，有什么办法解决这个问题？
-
-(这时候还是可以正常的读取服务器消息 - 这是另一个socket连接数据)
-```
+- @bug 内存提升
 
 ## 2025-12-04 08:49:42
 
 - @todo
 
-  - 扩展功能
-    - spad action
   - 其他功能
     - 命令行发送命令
   - ***
+  - 扩展功能
+    - spad action
   - state 数据
   - 工具类方法
     - excuse
@@ -231,4 +216,21 @@ func RunApp(w http.ResponseWriter, r *http.Request) {
     v := <-reply
     fmt.Println(v)
 }
+```
+
+- @bug
+
+  - CurrentWorkspaceId 不对
+
+- @ques 写入卡死，能正常读取
+  - 解决思路
+    - 写入使用队列
+    - isSwitch 跨线程
+
+```
+在单协程中多次发送命令
+n,err:=c.conn.Write([]byte(string(str) + "\r\n"))
+能正常返回n，但是服务器没有反应了，有什么办法解决这个问题？
+
+(这时候还是可以正常的读取服务器消息 - 这是另一个socket连接数据)
 ```

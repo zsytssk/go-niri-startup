@@ -1,3 +1,4 @@
 main
 *.local*
 niri-startup
+niri-bun.log

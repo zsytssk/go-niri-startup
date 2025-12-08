@@ -2,9 +2,8 @@ package config
 
 import (
 	"fmt"
+	"niri-startup/utils"
 	"os"
-	"path"
-	"path/filepath"
 
 	"gopkg.in/yaml.v3"
 )
@@ -26,14 +25,16 @@ func GetConfig() (Config, error) {
 	if config != nil {
 		return *config, nil
 	}
-	config = &Config{}
-	ex, err := os.Executable()
+	configPath, err := utils.GetCurDirFileName("config.yml")
 	if err != nil {
 		return *config, err
 	}
-	exDir := filepath.Dir(ex)
-	configPath := path.Join(exDir, "config.yaml")
 
+	configPath, err = utils.GetCurDirFilePath(configPath)
+	if err != nil {
+		return *config, err
+	}
+	config = &Config{}
 	configFile, err := os.ReadFile(configPath)
 	if err != nil {
 		configFile, err = os.ReadFile("config.local.yml")

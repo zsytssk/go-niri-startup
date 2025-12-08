@@ -21,7 +21,7 @@ func SwitchScreen(changeSpace int) {
 	curIndex := slices.Index(instance.Outputs, curOutput)
 	nextIndex := curIndex + changeSpace
 
-	if nextIndex > len(instance.Outputs) {
+	if nextIndex >= len(instance.Outputs) {
 		nextIndex = 0
 	} else if nextIndex < 0 {
 		nextIndex = len(instance.Outputs) - 1

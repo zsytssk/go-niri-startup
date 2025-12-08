@@ -20,14 +20,14 @@ func getCmd() []string {
 	return os.Args[1:]
 }
 
-const PORT = 6322
+const PORT = 6321
 
 func main() {
 	// 处理命令行参数
 	args := getCmd()
 	if len(args) > 0 {
 		name, data := args[0], args[1]
-		http.Post(fmt.Sprintf("http://127.0.0.1:6322/%s", name), "application/json", bytes.NewBuffer([]byte(data)))
+		http.Post(fmt.Sprintf("http://127.0.0.1:%d/%s", PORT, name), "application/json", bytes.NewBuffer([]byte(data)))
 		return
 	}
 	// 处理本地服务器
@@ -40,7 +40,7 @@ func main() {
 	}
 	state.GetStateInstance()
 	utils.GetSocketInstance()
-
+	utils.RunCMD("notify-send 启动 niri-ts-startup!", false)
 	http.HandleFunc("/spad", spad.Spad)
 	http.HandleFunc("/action", action.Action)
 	http.HandleFunc("/runApp", command.RunApp)

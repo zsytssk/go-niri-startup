@@ -12,7 +12,7 @@ func PowerAction() error {
 		return err
 	}
 	if result == "󰌾 Lock" {
-		utils.RunCMD("swaylock --daemonize", false)
+		utils.RunCMD("swaylock --daemonize", true)
 		time.Sleep(1 * time.Second)
 		utils.NiriSendAction(utils.Action{
 			PowerOffMonitors: &utils.Empty{},

@@ -1,5 +1,7 @@
 package utils
 
+import "time"
+
 type Empty struct{}
 type WindowWithId struct {
 	Id int `json:"id"`
@@ -70,13 +72,11 @@ func NiriSendAction(obj Action) {
 func NiriSendActionArr(arr []Action) {
 	client := GetSocketInstance()
 	for _, obj := range arr {
-		// if obj.Sleep != 0 {
-		// 	// time.Sleep(time.Duration(obj.Sleep) * time.Millisecond)
-		// } else {
-		// 	var msg = map[string]Action{"Action": obj}
-		// 	client.Send(msg)
-		// }
-		var msg = map[string]Action{"Action": obj}
-		client.Send(msg)
+		if obj.Sleep != 0 {
+			time.Sleep(time.Duration(obj.Sleep) * time.Millisecond)
+		} else {
+			var msg = map[string]Action{"Action": obj}
+			client.Send(msg)
+		}
 	}
 }
