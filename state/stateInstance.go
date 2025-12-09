@@ -2,16 +2,21 @@ package state
 
 import (
 	"niri-startup/utils"
+	"sync"
 )
 
-var StateInstance *State
+var (
+	StateInstance State
+	once          sync.Once
+)
 
 func GetStateInstance() *State {
 
-	if StateInstance == nil {
+	once.Do(func() {
 		create()
-	}
-	return StateInstance
+	})
+	return &StateInstance
+
 }
 
 func create() {
@@ -23,21 +28,13 @@ func create() {
 		Listeners: make(map[string][]utils.Listener, 0),
 		Counter:   0,
 	}
-	StateInstance = &State{
+	StateInstance = State{
 		Windows:             make(map[int]Window, 0),
 		Workspaces:          make(map[int]Workspace, 0),
 		OriginWorkspaceInfo: make(map[int]OriginWorkspaceInfo, 0),
 		OriginWindowInfo:    make(map[int]OriginWindowInfo, 0),
 		Event:               event,
+		Client:              client,
 	}
-	StateInstance.BindEventStream(client)
-
-	// s.OnEvent("WorkspacesChanged", func(w interface{}) {
-	// 	// ws := w.(map[int]Workspace)
-	// 	// fmt.Println(len(ws))
-	// 	_, data := utils.GetData(w.(json.RawMessage))
-	// 	workspaces := make([]Workspace, 0)
-	// 	json.Unmarshal(data, &workspaces)
-	// 	fmt.Println(len(workspaces))
-	// })
+	StateInstance.BindEventStream()
 }

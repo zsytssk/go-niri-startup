@@ -2,20 +2,137 @@
 
 - @bug 内存提升
 
+- @ques Map / Slice 的元素一律存 指针
+
+  - Msg + Action -> 剔除 地址
+
+    - Action 是可选参数，用地址更合适
+    - Msg 同理
+
+- @ques sort.Slice -> slice.SortFunc
+
+- @opt 有些地方是`&item` 有些地方是`item` 能不能统一
+  - 避免不必要的 copy，能用地址就用地址
+
+```
+curl -X POST http://127.0.0.1:6321/spad -d {\"name\":\"term\"}
+```
+
+```
+curl -X POST http://127.0.0.1:6321/runApp -d '{"app_id":"thunar", "cmd":"thunar"}'
+```
+
+https://github.com/probeldev/niri-float-sticky/tree/main/niri-events
+
+- go 代码写起来让人无法感觉爽
+
+- @ques 下面代码有问题？
+
+```go
+for _, w := range state.Windows {
+			if filterFn(&w) {
+				return &w, nil
+			}
+		}
+```
+
+- @opt `s.Workspaces[item.ID] = item` 使用引用？
+
+```go
+if focus {
+		s.CurrentWorkspaceId = curId
+
+		for _, item := range s.Workspaces {
+			item.IsFocused = item.ID == curId
+			s.Workspaces[item.ID] = item
+		}
+	}
+```
+
+- 这个函数会卡死， 为什么？如何解决
+
+```go
+stdout, _ := cmd.StdoutPipe()
+go io.Copy(&buf, stdout)
+cmd.Start()
+cmd.Wait()
+
+
+    stdout, _ := cmd.StdoutPipe()
+    stderr, _ := cmd.StderrPipe()
+
+    if err := cmd.Start(); err != nil {
+        return "", err
+    }
+
+    outBytes, _ := io.ReadAll(stdout)
+    errBytes, _ := io.ReadAll(stderr)
+
+    if err := cmd.Wait(); err != nil {
+        return "", fmt.Errorf("%w: %s", err, string(errBytes))
+    }
+```
+
+```go
+func RunCMD(input string, nohup bool) (string, error) {
+	var cmd *exec.Cmd
+	if nohup {
+		cmd = exec.Command("bash", "-c",
+			fmt.Sprintf("nohup sh -c '%s' > /dev/null 2>&1 &", input),
+		)
+	} else {
+		cmd = exec.Command("bash", "-c", input)
+	}
+
+	var buf bytes.Buffer
+	cmd.Stdout = &buf
+	cmd.Stderr = &buf // 如果你也想捕获错误输出
+
+	if err := cmd.Run(); err != nil {
+		return "", err
+	}
+
+	return strings.TrimSpace(buf.String()), nil
+}
+```
+
+### end
+
+- @opt 问题
+  - 我在用的时候没有遇到问题 -> 会不会是 go 新版本改好这个问题
+
+```go
+for _, w := range state.Windows { // w是循环临时变量，地址固定
+    if filterFn(&w) { // 传递的是临时变量w的地址，而非原切片元素的地址
+        wins = append(wins, &w) // 追加的是同一个临时变量的地址
+    }
+}
+```
+
+- @ques runApp 的顺序问题
 - @ques 优化 switchScreen 脚本
 
   - 其他窗口的动画
 
 - @ques 发送命令放到一个线程中
+
   - 怎么处理断线的逻辑？
 
-## 2025-12-04 08:49:42
+- @ques 能不能等待某个值变为 true 后执行某个代码
+  - 如果某个值为 true 时发送返回，不然不返回？
+  - 跨线程， 支持并发
+
+```
+wait(x)
+xxx
+```
 
 - @todo
 
+  - ***
+
   - 其他功能
     - 命令行发送命令
-  - ***
   - 扩展功能
     - spad action
   - state 数据
@@ -38,59 +155,43 @@
 
 - @ques 如何申请两个 socket
 
-- @ques 内存使用 对比 js 版本
+- @ques 内存使用 对比 js 版本 -> go 为 1/5
 
 - @ques SwitchScreen workspace 没有转换 + 当前 index 错误， 卡住无法继续
 
-- @opt 有些地方是`&item` 有些地方是`item` 能不能统一
-
-```
-curl -X POST http://127.0.0.1:6322/spad -d {\"name\":\"term\"}
-```
-
-```
-curl -X POST http://127.0.0.1:6322/runApp -d '{"app_id":"thunar", "cmd":"thunar"}'
-```
-
-https://github.com/probeldev/niri-float-sticky/tree/main/niri-events
-
-- go 代码写起来让人无法感觉爽
-
-- @ques 下面的函数怎么转换成 go
+- @ques `-time.After(3 * time.Second)` 要不要 close ch
 
 ```ts
-export const useWaitWindowOpen = (state: NiriStateType) => {
-  return async (filterFn: (item: any) => boolean) => {
-    for (const [key, item] of state.windows) {
-      if (filterFn(item)) {
-        return item;
-      }
-    }
-    return new Promise((resolve) => {
-      const off = state.onEvent("WindowOpenedOrChanged", (obj) => {
-        const window = obj.WindowOpenedOrChanged.window;
-        if (filterFn(window)) {
-          resolve(window);
-          off();
-        }
-      });
-    });
-  };
-};
-```
+func UseWaitWindowOpen(state *State) func(func(*Window) bool) (*Window, error) {
+	return func(filterFn func(*Window) bool) (*Window, error) {
+		for _, w := range state.Windows {
+			if filterFn(&w) {
+				return &w, nil
+			}
+		}
 
-- @opt `s.Workspaces[item.ID] = item` 使用引用？
+		ch := make(chan *Window, 1)
+		var off func()
+		off = state.OnEvent("WindowOpenedOrChanged", func(msg interface{}) {
+			w := &msg.(Msg).WindowOpenedOrChanged.Window
+			if filterFn(w) {
+				ch <- w
+				off()
+			}
+		})
 
-```go
-if focus {
-		s.CurrentWorkspaceId = curId
-
-		for _, item := range s.Workspaces {
-			item.IsFocused = item.ID == curId
-			s.Workspaces[item.ID] = item
+		select {
+		case w := <-ch:
+			return w, nil
+		case <-time.After(3 * time.Second):
+			off() // 超时也取消事件监听
+			return nil, fmt.Errorf("timeout waiting for window")
 		}
 	}
+}
 ```
+
+## 2025-12-04 08:49:42
 
 ## 2025-12-04 14:58:11
 

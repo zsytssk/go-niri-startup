@@ -22,11 +22,11 @@ type Client struct {
 
 var socket = os.Getenv("NIRI_SOCKET")
 
-func NewClient(name string) *Client {
+func NewClient(name string) Client {
 	if socket == "" {
 		panic("环境变量 NIRI_SOCKET 未设置")
 	}
-	return &Client{
+	return Client{
 		name:        name,
 		socketPath:  socket,
 		quit:        make(chan struct{}),
@@ -50,6 +50,7 @@ func (c *Client) Connect() {
 			}
 		}
 	}()
+
 	go func() {
 		for {
 			select {

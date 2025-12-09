@@ -36,6 +36,11 @@ func RunApp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	apps := windowFilter(filterFn)
+	slices.SortFunc(apps, func(a, b *state.Window) int {
+		ax := a.Layout.PosInScrollingLayout[0]
+		bx := b.Layout.PosInScrollingLayout[0]
+		return ax - bx
+	})
 	var window *state.Window
 	if len(apps) != 0 {
 		index := slices.IndexFunc(apps, func(item *state.Window) bool {

@@ -1,6 +1,9 @@
 package utils
 
-import "time"
+import (
+	"sync"
+	"time"
+)
 
 type Empty struct{}
 type WindowWithId struct {
@@ -53,14 +56,17 @@ type Action struct {
 	Sleep                  int                     `json:"-"`
 }
 
-var SocketInstance *Client
+var (
+	socketInstance Client
+	once           sync.Once
+)
 
 func GetSocketInstance() *Client {
-	if SocketInstance == nil {
-		SocketInstance = NewClient("SendClient")
-		SocketInstance.Connect()
-	}
-	return SocketInstance
+	once.Do(func() {
+		socketInstance = NewClient("SendClient")
+		socketInstance.Connect()
+	})
+	return &socketInstance
 }
 
 func NiriSendAction(obj Action) {

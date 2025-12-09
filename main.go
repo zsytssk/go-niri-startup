@@ -46,6 +46,7 @@ func main() {
 	http.HandleFunc("/runApp", command.RunApp)
 	http.HandleFunc("/getState", command.GetState)
 	err = http.ListenAndServe(fmt.Sprintf(":%d", PORT), nil)
+	utils.RunCMD("notify-send 退出 niri-ts-startup!", false)
 	if err != nil {
 		panic(err)
 	}

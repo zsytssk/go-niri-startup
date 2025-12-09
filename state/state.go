@@ -22,15 +22,15 @@ type State struct {
 	Workspaces          map[int]Workspace
 	OriginWorkspaceInfo map[int]OriginWorkspaceInfo
 	OriginWindowInfo    map[int]OriginWindowInfo
+	Client              utils.Client
 	utils.Event         `json:"-"`
 }
 
-func (s *State) BindEventStream(client *utils.Client) {
+func (s *State) BindEventStream() {
 	go func() {
-		<-client.Connected
-		client.Send("EventStream")
-		for msg := range client.ReviveMsgCh {
-			// fmt.Println(`EventStream`, string(msg))
+		<-s.Client.Connected
+		s.Client.Send("EventStream")
+		for msg := range s.Client.ReviveMsgCh {
 			msgType := utils.GetMsgType(msg)
 			var data Msg
 			json.Unmarshal(msg, &data)
@@ -169,7 +169,8 @@ func (s *State) setCurWindowId(curId int) {
 
 	w, ok := s.Windows[curId]
 	if ok {
-		for _, item := range s.Windows {
+		for id := range s.Windows {
+			item := s.Windows[id]
 			item.IsFocused = item.ID == curId
 			s.Windows[item.ID] = item
 		}

@@ -51,7 +51,6 @@ func SelectWindow() error {
 		}
 		return a.Idx - b.Idx
 	})
-	fmt.Println(wins)
 	var lines []string
 	for i, item := range wins {
 		lines = append(lines,

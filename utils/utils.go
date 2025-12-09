@@ -1,9 +1,9 @@
 package utils
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net"
 	"net/http"
 	"os"
@@ -52,15 +52,21 @@ func RunCMD(input string, nohup bool) (string, error) {
 		cmd = exec.Command("bash", "-c", input)
 	}
 
-	var buf bytes.Buffer
-	cmd.Stdout = &buf
-	cmd.Stderr = &buf // 如果你也想捕获错误输出
+	stdout, _ := cmd.StdoutPipe()
+	stderr, _ := cmd.StderrPipe()
 
-	if err := cmd.Run(); err != nil {
+	if err := cmd.Start(); err != nil {
 		return "", err
 	}
 
-	return strings.TrimSpace(buf.String()), nil
+	outBytes, _ := io.ReadAll(stdout)
+	errBytes, _ := io.ReadAll(stderr)
+
+	if err := cmd.Wait(); err != nil {
+		return "", fmt.Errorf("%w: %s", err, string(errBytes))
+	}
+
+	return strings.TrimSpace(string(outBytes)), nil
 }
 
 func ReturnHttp(w http.ResponseWriter, msg string) {
