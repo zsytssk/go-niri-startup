@@ -29,7 +29,7 @@ func (s *State) BindEventStream(client *utils.Client) {
 	go func() {
 		<-client.Connected
 		client.Send("EventStream")
-		for msg := range client.Message {
+		for msg := range client.ReviveMsgCh {
 			// fmt.Println(`EventStream`, string(msg))
 			msgType := utils.GetMsgType(msg)
 			var data Msg
