@@ -63,15 +63,17 @@ func UseWaitScreenShot(state *State) func() string {
 	return func() string {
 		ch := make(chan string, 1)
 		var off1 func()
+		var off2 func()
 		off1 = state.OnEvent("ScreenshotCaptured", func(obj interface{}) {
 			path := obj.(Msg).ScreenshotCaptured.Path
 			ch <- path
 			off1()
+			off2()
 		})
 
-		var off2 func()
 		off2 = state.OnEvent("WindowFocusTimestampChanged", func(obj interface{}) {
 			ch <- ""
+			off1()
 			off2()
 		})
 

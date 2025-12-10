@@ -40,6 +40,9 @@ func (e *Event) OffEvent(eventName string, fn Listener) {
 			index = i
 		}
 	}
+	if index == -1 {
+		return
+	}
 	e.Listeners[eventName] = append(e.Listeners[eventName][:index], e.Listeners[eventName][index+1:]...)
 }
 
