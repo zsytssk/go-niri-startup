@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"niri-startup/utils"
 	"os"
+	"sync"
 
 	"gopkg.in/yaml.v3"
 )
@@ -19,34 +20,43 @@ type Config struct {
 	SpadMap map[string]Spad `yaml:"spadMap"`
 }
 
-var config *Config
+var (
+	config Config
+	once   sync.Once
+)
 
-func GetConfig() (Config, error) {
-	if config != nil {
-		return *config, nil
-	}
-	configPath, err := utils.GetCurDirFileName("config.yml")
-	if err != nil {
-		return *config, err
-	}
+func GetConfig() (*Config, error) {
 
-	configPath, err = utils.GetCurDirFilePath(configPath)
+	var err error
+	once.Do(func() {
+		var configPath string
+		configPath, err = utils.GetCurDirFileName("config.yml")
+		if err != nil {
+			return
+		}
+
+		configPath, err = utils.GetCurDirFilePath(configPath)
+		if err != nil {
+			return
+		}
+		config = Config{}
+
+		configFile, err := os.ReadFile(configPath)
+		if err != nil {
+			configFile, err = os.ReadFile("config.local.yml")
+		}
+		if err != nil {
+			return
+		}
+		err = yaml.Unmarshal(configFile, &config)
+		if err != nil {
+			return
+		}
+	})
 	if err != nil {
-		return *config, err
+		return nil, err
 	}
-	config = &Config{}
-	configFile, err := os.ReadFile(configPath)
-	if err != nil {
-		configFile, err = os.ReadFile("config.local.yml")
-	}
-	if err != nil {
-		return *config, err
-	}
-	err = yaml.Unmarshal(configFile, config)
-	if err != nil {
-		return *config, err
-	}
-	return *config, err
+	return &config, err
 }
 
 func GetSpadConfig(name string) (*Spad, error) {

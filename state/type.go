@@ -2,7 +2,7 @@ package state
 
 import "encoding/json"
 
-type Msg struct {
+type EventStreamMsg struct {
 	WorkspacesChanged           *WorkspacesChanged           `json:"WorkspacesChanged,omitempty"`
 	WorkspaceActivated          *WorkspaceActivated          `json:"WorkspaceActivated,omitempty"`
 	WindowsChanged              *WindowsChanged              `json:"WindowsChanged,omitempty"`

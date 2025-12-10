@@ -2,6 +2,11 @@ package utils
 
 import "fmt"
 
+type Listener struct {
+	Id string
+	Fn func(interface{})
+}
+
 type Event struct {
 	Listeners map[string][]Listener
 	Counter   int
@@ -50,9 +55,4 @@ func (e *Event) TriggerEvent(eventName string, data interface{}) {
 	for _, item := range e.Listeners[eventName] {
 		item.Fn(data)
 	}
-}
-
-type Listener struct {
-	Id string
-	Fn func(interface{})
 }

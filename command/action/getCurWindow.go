@@ -51,8 +51,8 @@ func bindActiveWindowChange(req ActionReq) {
 	bindMap[req.Output] = true
 	instance := state.GetStateInstance()
 	instance.OnEvent("FocusWindow", func(i interface{}) {
-		w := i.(state.Window)
-		if w.ID == 0 {
+		w := i.(*state.Window)
+		if w == nil || w.ID == 0 {
 			utils.RunCMD(fmt.Sprintf(`pkill -RTMIN+%d waybar`, req.Signal), false)
 			return
 		}

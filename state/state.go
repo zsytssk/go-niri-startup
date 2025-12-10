@@ -3,7 +3,7 @@ package state
 import (
 	"encoding/json"
 	"niri-startup/utils"
-	"sort"
+	"slices"
 )
 
 type OriginWorkspaceInfo struct {
@@ -32,7 +32,7 @@ func (s *State) BindEventStream() {
 		s.Client.Send("EventStream")
 		for msg := range s.Client.ReviveMsgCh {
 			msgType := utils.GetMsgType(msg)
-			var data Msg
+			var data EventStreamMsg
 			json.Unmarshal(msg, &data)
 			s.TriggerEvent(msgType, data)
 			// fmt.Println(`test:>msg`, msgType, string(msg))
@@ -89,7 +89,6 @@ func (s *State) BindEventStream() {
 
 						if w, ok := s.Windows[id]; ok {
 							w.Layout = layout
-							s.Windows[id] = w
 						}
 					}
 				}
@@ -125,7 +124,6 @@ func (s *State) setActiveWorkspace(curId int, activeWindowId int, focus bool) {
 
 		for _, item := range s.Workspaces {
 			item.IsFocused = item.ID == curId
-			s.Workspaces[item.ID] = item
 		}
 	}
 }
@@ -235,10 +233,11 @@ func (s *State) outputsChange(workspaces []Workspace) {
 	for _, m := range monitors {
 		arr = append(arr, m)
 	}
-	sort.Slice(arr, func(i, j int) bool {
-		a := arr[i]
-		b := arr[j]
-		return a.Logical.X < b.Logical.X || a.Logical.Y < b.Logical.Y
+	slices.SortFunc(arr, func(a, b Monitor) int {
+		if a.Logical.X != b.Logical.X {
+			return a.Logical.X - b.Logical.X
+		}
+		return a.Logical.Y - b.Logical.Y
 	})
 	s.Outputs = s.Outputs[:0]
 

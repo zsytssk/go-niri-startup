@@ -2,7 +2,7 @@ package state
 
 import (
 	"fmt"
-	"sort"
+	"slices"
 	"time"
 )
 
@@ -17,7 +17,7 @@ func UseWaitWindowOpen(state *State) func(func(*Window) bool) (*Window, error) {
 		ch := make(chan *Window, 1)
 		var off func()
 		off = state.OnEvent("WindowOpenedOrChanged", func(msg interface{}) {
-			w := &msg.(Msg).WindowOpenedOrChanged.Window
+			w := &msg.(EventStreamMsg).WindowOpenedOrChanged.Window
 			if filterFn(w) {
 				ch <- w
 				off()
@@ -49,7 +49,7 @@ func UseOnWindowBlur(state *State) func(*Window, func()) func() {
 	return func(win *Window, fn func()) func() {
 		var off func()
 		off = state.OnEvent("WindowFocusChanged", func(obj interface{}) {
-			if obj.(Msg).WindowFocusChanged.Id != win.ID {
+			if obj.(EventStreamMsg).WindowFocusChanged.Id != win.ID {
 				fn()
 				off()
 			}
@@ -65,7 +65,7 @@ func UseWaitScreenShot(state *State) func() string {
 		var off1 func()
 		var off2 func()
 		off1 = state.OnEvent("ScreenshotCaptured", func(obj interface{}) {
-			path := obj.(Msg).ScreenshotCaptured.Path
+			path := obj.(EventStreamMsg).ScreenshotCaptured.Path
 			ch <- path
 			off1()
 			off2()
@@ -92,15 +92,15 @@ func UseWorkspaceWindows(state *State) func(workspaceId int) []*Window {
 			}
 			result = append(result, window)
 		}
-		sort.Slice(result, func(i, j int) bool {
-			a := result[i]
-			b := result[j]
+		slices.SortFunc(result, func(a, b *Window) int {
 			ax := a.Layout.PosInScrollingLayout[0]
 			ay := a.Layout.PosInScrollingLayout[1]
 			bx := b.Layout.PosInScrollingLayout[0]
 			by := b.Layout.PosInScrollingLayout[1]
-
-			return ax < bx || ay < by
+			if ax != bx {
+				return ax - bx
+			}
+			return ay - by
 		})
 
 		return result

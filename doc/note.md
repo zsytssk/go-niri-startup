@@ -9,8 +9,6 @@
     - Action 是可选参数，用地址更合适
     - Msg 同理
 
-- @ques sort.Slice -> slice.SortFunc
-
 - @opt 有些地方是`&item` 有些地方是`item` 能不能统一
   - 避免不必要的 copy，能用地址就用地址
 
@@ -26,6 +24,9 @@ https://github.com/probeldev/niri-float-sticky/tree/main/niri-events
 
 - go 代码写起来让人无法感觉爽
 
+### end
+
+- @ques sort.Slice -> slice.SortFunc
 - @ques 下面代码有问题？
 
 ```go
@@ -95,8 +96,6 @@ func RunCMD(input string, nohup bool) (string, error) {
 	return strings.TrimSpace(buf.String()), nil
 }
 ```
-
-### end
 
 - @opt 问题
   - 我在用的时候没有遇到问题 -> 会不会是 go 新版本改好这个问题

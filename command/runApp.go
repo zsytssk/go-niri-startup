@@ -63,19 +63,6 @@ func RunApp(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	// // CurrentWorkspaceId := instance.CurrentWorkspaceId
-	// actions := []utils.Action{
-	// 	{
-	// 		FocusWindow: &utils.WindowWithId{
-	// 			Id: window.ID,
-	// 		},
-	// 	},
-	// 	// {
-	// 	// 	CenterWindow: &utils.WindowWithId{
-	// 	// 		Id: window.ID,
-	// 	// 	},
-	// 	// },
-	// }
 
 	utils.NiriSendAction(utils.Action{
 		FocusWindow: &utils.WindowWithId{
