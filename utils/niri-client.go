@@ -12,7 +12,7 @@ import (
 type Client struct {
 	name        string
 	socketPath  string
-	conn        net.Conn
+	Conn        net.Conn
 	quit        chan struct{}
 	Connected   chan struct{}
 	ReviveMsgCh chan []byte
@@ -41,7 +41,7 @@ func (c *Client) Connect() {
 
 	go func() {
 		for msg := range c.SendMsgCh {
-			_, err := fmt.Fprintf(c.conn, "%s\n", msg)
+			_, err := fmt.Fprintf(c.Conn, "%s\n", msg)
 			if err != nil {
 				select {
 				case c.ReviveErrCh <- err:
@@ -67,20 +67,19 @@ func (c *Client) Connect() {
 				continue
 			}
 
-			c.conn = conn
+			c.Conn = conn
 
 			fmt.Println("已连接", c.name)
 			select {
 			case c.Connected <- struct{}{}:
 			default:
 			}
-			fmt.Println(`test:>NewReader`, c)
-			reader := bufio.NewReader(c.conn)
+			reader := bufio.NewReader(c.Conn)
 			for {
 				line, err := reader.ReadBytes('\n')
 				if err != nil { // 远端断开或 socket 被关闭
-					_ = c.conn.Close()
-					c.conn = nil
+					_ = c.Conn.Close()
+					c.Conn = nil
 
 					break
 				}
@@ -101,8 +100,7 @@ func (c *Client) Connect() {
 }
 
 func (c *Client) Send(msg interface{}) ([]byte, error) {
-	fmt.Println(`test:>SendMsgCh`, msg, c.name, c)
-	if c.conn == nil {
+	if c.Conn == nil {
 		return nil, fmt.Errorf("未连接")
 	}
 	str, err := json.Marshal(msg)
@@ -124,7 +122,7 @@ func (c *Client) Send(msg interface{}) ([]byte, error) {
 func (c *Client) Stop() {
 	close(c.quit)
 	close(c.SendMsgCh)
-	if c.conn != nil {
-		_ = c.conn.Close()
+	if c.Conn != nil {
+		_ = c.Conn.Close()
 	}
 }

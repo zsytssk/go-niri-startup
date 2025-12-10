@@ -15,7 +15,6 @@ func SwitchScreen(changeSpace int) {
 	instance := state.GetStateInstance()
 	workspaces := instance.Workspaces
 	curWorkspace, ok := workspaces[instance.CurrentWorkspaceId]
-	fmt.Println(`test:>0`, len(instance.Workspaces))
 	if !ok || isSwitch.Load() {
 		return
 	}
@@ -30,7 +29,6 @@ func SwitchScreen(changeSpace int) {
 		nextIndex = len(instance.Outputs) - 1
 	}
 	nextOutput := instance.Outputs[nextIndex]
-	fmt.Println(`test:>1`)
 	if !ok {
 		return
 	}

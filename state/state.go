@@ -2,7 +2,6 @@ package state
 
 import (
 	"encoding/json"
-	"fmt"
 	"niri-startup/utils"
 	"sort"
 )
@@ -36,7 +35,7 @@ func (s *State) BindEventStream() {
 			var data Msg
 			json.Unmarshal(msg, &data)
 			s.TriggerEvent(msgType, data)
-			fmt.Println(`test:>msg`, msgType, string(msg))
+			// fmt.Println(`test:>msg`, msgType, string(msg))
 			switch msgType {
 			case "WorkspacesChanged":
 				{
