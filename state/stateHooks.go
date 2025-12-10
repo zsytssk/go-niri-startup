@@ -9,8 +9,8 @@ import (
 func UseWaitWindowOpen(state *State) func(func(*Window) bool) (*Window, error) {
 	return func(filterFn func(*Window) bool) (*Window, error) {
 		for _, w := range state.Windows {
-			if filterFn(&w) {
-				return &w, nil
+			if filterFn(w) {
+				return w, nil
 			}
 		}
 
@@ -38,8 +38,8 @@ func UseWindowFilter(state *State) func(func(*Window) bool) []*Window {
 	return func(filterFn func(*Window) bool) []*Window {
 		wins := make([]*Window, 0)
 		for _, w := range state.Windows {
-			if filterFn(&w) {
-				wins = append(wins, &w)
+			if filterFn(w) {
+				wins = append(wins, w)
 			}
 		}
 		return wins
@@ -91,7 +91,7 @@ func UseWorkspaceWindows(state *State) func(workspaceId int) []*Window {
 			if window.WorkspaceID != workspaceId {
 				continue
 			}
-			result = append(result, &window)
+			result = append(result, window)
 		}
 		sort.Slice(result, func(i, j int) bool {
 			a := result[i]

@@ -13,13 +13,13 @@ func ResetState() {
 	OriginWindowInfo := instance.OriginWindowInfo
 	OriginWorkspaceInfo := instance.OriginWorkspaceInfo
 
-	activeWorkspaces := make([]state.Workspace, 0)
+	activeWorkspaces := make([]*state.Workspace, 0)
 
 	for _, workspace := range Workspaces {
 		if workspace.IsFocused {
 			activeWorkspaces = append(activeWorkspaces, workspace)
 		} else if workspace.IsActive {
-			activeWorkspaces = append([]state.Workspace{workspace}, activeWorkspaces...)
+			activeWorkspaces = append([]*state.Workspace{workspace}, activeWorkspaces...)
 		}
 	}
 

@@ -29,10 +29,10 @@ func create() {
 		Counter:   0,
 	}
 	StateInstance = State{
-		Windows:             make(map[int]Window, 0),
-		Workspaces:          make(map[int]Workspace, 0),
-		OriginWorkspaceInfo: make(map[int]OriginWorkspaceInfo, 0),
-		OriginWindowInfo:    make(map[int]OriginWindowInfo, 0),
+		Windows:             make(map[int]*Window, 0),
+		Workspaces:          make(map[int]*Workspace, 0),
+		OriginWorkspaceInfo: make(map[int]*OriginWorkspaceInfo, 0),
+		OriginWindowInfo:    make(map[int]*OriginWindowInfo, 0),
 		Event:               event,
 		Client:              client,
 	}

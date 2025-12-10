@@ -68,21 +68,23 @@ func (c *Client) Connect() {
 			}
 
 			c.conn = conn
-			fmt.Println("已连接", c.name)
 
+			fmt.Println("已连接", c.name)
 			select {
 			case c.Connected <- struct{}{}:
 			default:
 			}
-
+			fmt.Println(`test:>NewReader`, c)
 			reader := bufio.NewReader(c.conn)
 			for {
 				line, err := reader.ReadBytes('\n')
 				if err != nil { // 远端断开或 socket 被关闭
 					_ = c.conn.Close()
 					c.conn = nil
+
 					break
 				}
+
 				select {
 				case c.ReviveMsgCh <- line:
 				default:
@@ -99,6 +101,7 @@ func (c *Client) Connect() {
 }
 
 func (c *Client) Send(msg interface{}) ([]byte, error) {
+	fmt.Println(`test:>SendMsgCh`, msg, c.name, c)
 	if c.conn == nil {
 		return nil, fmt.Errorf("未连接")
 	}

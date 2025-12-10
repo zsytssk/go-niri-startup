@@ -2,6 +2,7 @@ package state
 
 import (
 	"encoding/json"
+	"fmt"
 	"niri-startup/utils"
 	"sort"
 )
@@ -18,10 +19,10 @@ type State struct {
 	CurrentWindowId     int
 	CurrentWorkspaceId  int
 	OverviewOpen        bool
-	Windows             map[int]Window
-	Workspaces          map[int]Workspace
-	OriginWorkspaceInfo map[int]OriginWorkspaceInfo
-	OriginWindowInfo    map[int]OriginWindowInfo
+	Windows             map[int]*Window
+	Workspaces          map[int]*Workspace
+	OriginWorkspaceInfo map[int]*OriginWorkspaceInfo
+	OriginWindowInfo    map[int]*OriginWindowInfo
 	Client              utils.Client
 	utils.Event         `json:"-"`
 }
@@ -35,11 +36,11 @@ func (s *State) BindEventStream() {
 			var data Msg
 			json.Unmarshal(msg, &data)
 			s.TriggerEvent(msgType, data)
-			// fmt.Println(`test:>msg`, msgType, string(msg))
+			fmt.Println(`test:>msg`, msgType, string(msg))
 			switch msgType {
 			case "WorkspacesChanged":
 				{
-					s.Workspaces = make(map[int]Workspace, 0)
+					s.Workspaces = make(map[int]*Workspace, 0)
 					s.outputsChange(data.WorkspacesChanged.Workspaces)
 					for _, m := range data.WorkspacesChanged.Workspaces {
 						s.addWorkspace(m)
@@ -56,7 +57,7 @@ func (s *State) BindEventStream() {
 				}
 			case "WindowsChanged":
 				{
-					s.Windows = make(map[int]Window, 0)
+					s.Windows = make(map[int]*Window, 0)
 					wins := data.WindowsChanged.Windows
 					for _, wi := range wins {
 						s.addWindow(wi)
@@ -106,7 +107,7 @@ func (s *State) setActiveWorkspace(curId int, activeWindowId int, focus bool) {
 		return
 	}
 
-	for id, item := range s.Workspaces {
+	for _, item := range s.Workspaces {
 		if item.Output != output {
 			continue
 		}
@@ -118,7 +119,6 @@ func (s *State) setActiveWorkspace(curId int, activeWindowId int, focus bool) {
 				item.ActiveWindowID = 0
 			}
 		}
-		s.Workspaces[id] = item
 	}
 
 	if focus {
@@ -131,7 +131,7 @@ func (s *State) setActiveWorkspace(curId int, activeWindowId int, focus bool) {
 	}
 }
 func (s *State) GetWindowOutput(windowId int) string {
-	var window Window
+	var window *Window
 	if w, ok := s.Windows[windowId]; ok {
 		window = w
 	} else {
@@ -147,7 +147,7 @@ func (s *State) GetWindowOutput(windowId int) string {
 }
 
 func (s *State) addWorkspace(workspace Workspace) {
-	s.Workspaces[workspace.ID] = workspace
+	s.Workspaces[workspace.ID] = &workspace
 	if workspace.IsFocused {
 		s.setActiveWorkspace(
 			workspace.ID,
@@ -157,7 +157,7 @@ func (s *State) addWorkspace(workspace Workspace) {
 	}
 
 	if _, ok := s.OriginWorkspaceInfo[workspace.ID]; !ok {
-		s.OriginWorkspaceInfo[workspace.ID] = OriginWorkspaceInfo{
+		s.OriginWorkspaceInfo[workspace.ID] = &OriginWorkspaceInfo{
 			Outout: workspace.Output,
 			Idx:    workspace.Idx,
 		}
@@ -169,10 +169,8 @@ func (s *State) setCurWindowId(curId int) {
 
 	w, ok := s.Windows[curId]
 	if ok {
-		for id := range s.Windows {
-			item := s.Windows[id]
+		for _, item := range s.Windows {
 			item.IsFocused = item.ID == curId
-			s.Windows[item.ID] = item
 		}
 		workspaceId := w.WorkspaceID
 		if workspaceId != 0 {
@@ -194,14 +192,14 @@ func (s *State) windowClose(id int) {
 	}
 }
 func (s *State) addWindow(window Window) {
-	s.Windows[window.ID] = window
+	s.Windows[window.ID] = &window
 	if window.IsFocused {
 		// @todo setTimeout
 		// s.setCurWindowId(window.ID)
 	}
 
 	if _, ok := s.OriginWindowInfo[window.ID]; !ok {
-		s.OriginWindowInfo[window.ID] = OriginWindowInfo{
+		s.OriginWindowInfo[window.ID] = &OriginWindowInfo{
 			Workspace: window.WorkspaceID,
 		}
 	}

@@ -1,6 +1,7 @@
 package action
 
 import (
+	"fmt"
 	"niri-startup/state"
 	"niri-startup/utils"
 	"slices"
@@ -14,6 +15,7 @@ func SwitchScreen(changeSpace int) {
 	instance := state.GetStateInstance()
 	workspaces := instance.Workspaces
 	curWorkspace, ok := workspaces[instance.CurrentWorkspaceId]
+	fmt.Println(`test:>0`, len(instance.Workspaces))
 	if !ok || isSwitch.Load() {
 		return
 	}
@@ -28,12 +30,13 @@ func SwitchScreen(changeSpace int) {
 		nextIndex = len(instance.Outputs) - 1
 	}
 	nextOutput := instance.Outputs[nextIndex]
+	fmt.Println(`test:>1`)
 	if !ok {
 		return
 	}
 
-	curOutputWorkspaces := make([]state.Workspace, 0)
-	nextOutputWorkspaces := make([]state.Workspace, 0)
+	curOutputWorkspaces := make([]*state.Workspace, 0)
+	nextOutputWorkspaces := make([]*state.Workspace, 0)
 
 	for _, item := range workspaces {
 		switch item.Output {
@@ -43,11 +46,12 @@ func SwitchScreen(changeSpace int) {
 			nextOutputWorkspaces = append(nextOutputWorkspaces, item)
 		}
 	}
+	fmt.Println(len(curOutputWorkspaces), len(nextOutputWorkspaces))
 
-	slices.SortFunc(curOutputWorkspaces, func(a, b state.Workspace) int {
+	slices.SortFunc(curOutputWorkspaces, func(a, b *state.Workspace) int {
 		return a.Idx - b.Idx
 	})
-	slices.SortFunc(nextOutputWorkspaces, func(a, b state.Workspace) int {
+	slices.SortFunc(nextOutputWorkspaces, func(a, b *state.Workspace) int {
 		return a.Idx - b.Idx
 	})
 
