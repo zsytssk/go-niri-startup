@@ -30,7 +30,6 @@ func (s *State) BindEventStream(client *utils.Client) {
 		<-client.Connected
 		client.Send("EventStream")
 		for msg := range client.ReviveMsgCh {
-			// fmt.Println(`EventStream`, string(msg))
 			msgType := utils.GetMsgType(msg)
 			var data Msg
 			json.Unmarshal(msg, &data)

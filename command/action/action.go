@@ -32,14 +32,16 @@ func Action(w http.ResponseWriter, r *http.Request) {
 	case "select-window":
 		SelectWindow()
 	case "screenshot-screen":
-		utils.NiriSendAction(utils.Action{
-			ScreenshotScreen: &utils.ScreenshotScreen{WriteToDisk: true, ShowPointer: false},
-		})
+		// utils.NiriSendAction(utils.Action{
+		// 	ScreenshotScreen: &utils.ScreenshotScreen{WriteToDisk: true, ShowPointer: false},
+		// })
+		utils.RunCMD("niri msg action screenshot-screen", false)
 		Screenshot()
 	case "screenshot":
-		utils.NiriSendAction(utils.Action{
-			Screenshot: &utils.ScreenshotScreen{ShowPointer: false},
-		})
+		// utils.NiriSendAction(utils.Action{
+		// 	Screenshot: &utils.ScreenshotScreen{WriteToDisk: true, ShowPointer: false},
+		// })
+		utils.RunCMD("niri msg action screenshot", false)
 		Screenshot()
 	case "screenshot-window":
 		utils.NiriSendAction(utils.Action{

@@ -9,6 +9,10 @@
 - @ques 发送命令放到一个线程中
   - 怎么处理断线的逻辑？
 
+```
+WindowFocusTimestampChanged {"WindowFocusTimestampChanged":{"id":34,"focus_timestamp":{"secs":10583,"nanos":787667183}}}
+```
+
 ## 2025-12-04 08:49:42
 
 - @todo
