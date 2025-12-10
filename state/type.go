@@ -3,15 +3,16 @@ package state
 import "encoding/json"
 
 type Msg struct {
-	WorkspacesChanged      *WorkspacesChanged      `json:"WorkspacesChanged,omitempty"`
-	WorkspaceActivated     *WorkspaceActivated     `json:"WorkspaceActivated,omitempty"`
-	WindowsChanged         *WindowsChanged         `json:"WindowsChanged,omitempty"`
-	WindowClosed           *WindowClosed           `json:"WindowClosed,omitempty"`
-	OverviewOpenedOrClosed *OverviewOpenedOrClosed `json:"OverviewOpenedOrClosed,omitempty"`
-	WindowOpenedOrChanged  *WindowOpenedOrChanged  `json:"WindowOpenedOrChanged,omitempty"`
-	WindowFocusChanged     *WindowFocusChanged     `json:"WindowFocusChanged,omitempty"`
-	WindowLayoutsChanged   *WindowLayoutsChanged   `json:"WindowLayoutsChanged,omitempty"`
-	ScreenshotCaptured     *ScreenshotCaptured     `json:"ScreenshotCaptured,omitempty"`
+	WorkspacesChanged           *WorkspacesChanged           `json:"WorkspacesChanged,omitempty"`
+	WorkspaceActivated          *WorkspaceActivated          `json:"WorkspaceActivated,omitempty"`
+	WindowsChanged              *WindowsChanged              `json:"WindowsChanged,omitempty"`
+	WindowClosed                *WindowClosed                `json:"WindowClosed,omitempty"`
+	OverviewOpenedOrClosed      *OverviewOpenedOrClosed      `json:"OverviewOpenedOrClosed,omitempty"`
+	WindowOpenedOrChanged       *WindowOpenedOrChanged       `json:"WindowOpenedOrChanged,omitempty"`
+	WindowFocusChanged          *WindowFocusChanged          `json:"WindowFocusChanged,omitempty"`
+	WindowLayoutsChanged        *WindowLayoutsChanged        `json:"WindowLayoutsChanged,omitempty"`
+	ScreenshotCaptured          *ScreenshotCaptured          `json:"ScreenshotCaptured,omitempty"`
+	WindowFocusTimestampChanged *WindowFocusTimestampChanged `json:"WindowFocusTimestampChanged,omitempty"`
 }
 
 type WorkspacesChanged struct {
@@ -41,6 +42,10 @@ type WindowOpenedOrChanged struct {
 type WindowFocusChanged = WindowClosed
 type WindowLayoutsChanged struct {
 	Changes [][2]json.RawMessage `json:"changes"`
+}
+type WindowFocusTimestampChanged struct {
+	Id             int             `json:"id"`
+	FocusTimestamp json.RawMessage `json:"focus_timestamp"`
 }
 
 type Logical struct {

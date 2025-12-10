@@ -127,6 +127,12 @@ wait(x)
 xxx
 ```
 
+```
+WindowFocusTimestampChanged {"WindowFocusTimestampChanged":{"id":34,"focus_timestamp":{"secs":10583,"nanos":787667183}}}
+```
+
+## 2025-12-04 08:49:42
+
 - @todo
 
   - ***

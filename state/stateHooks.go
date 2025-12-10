@@ -70,12 +70,9 @@ func UseWaitScreenShot(state *State) func() string {
 		})
 
 		var off2 func()
-		off2 = state.OnEvent("WindowFocusChanged", func(obj interface{}) {
-			if obj.(Msg).WindowFocusChanged.Id != 0 {
-				ch <- ""
-				off2()
-
-			}
+		off2 = state.OnEvent("WindowFocusTimestampChanged", func(obj interface{}) {
+			ch <- ""
+			off2()
 		})
 
 		return <-ch
