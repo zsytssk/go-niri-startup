@@ -23,7 +23,7 @@ type State struct {
 	OriginWorkspaceInfo map[int]*OriginWorkspaceInfo
 	OriginWindowInfo    map[int]*OriginWindowInfo
 	Client              utils.Client
-	utils.Event         `json:"-"`
+	*utils.Event        `json:"-"`
 }
 
 func (s *State) BindEventStream() {

@@ -26,11 +26,8 @@ func create() {
 		Workspaces:          make(map[int]*Workspace, 0),
 		OriginWorkspaceInfo: make(map[int]*OriginWorkspaceInfo, 0),
 		OriginWindowInfo:    make(map[int]*OriginWindowInfo, 0),
-		Event: utils.Event{
-			Listeners: make(map[string][]utils.Listener, 0),
-			Counter:   0,
-		},
-		Client: utils.NewClient("EventStreamClient"),
+		Event:               utils.NewEvent(),
+		Client:              utils.NewClient("EventStreamClient"),
 	}
 	StateInstance.Client.Connect()
 	StateInstance.BindEventStream()
