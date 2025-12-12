@@ -14,7 +14,7 @@ type Event struct {
 
 func (e *Event) OnEvent(eventName string, fn func(interface{})) func() {
 	e.Counter++
-	id := fmt.Sprintf("%s_%d", eventName, e.Counter)
+	id := fmt.Sprintf("%s:%d", eventName, e.Counter)
 	listener := Listener{
 		id,
 		fn,
@@ -29,7 +29,7 @@ func (e *Event) OnEvent(eventName string, fn func(interface{})) func() {
 func (e *Event) OnceEvent(eventName string, fn func(interface{})) {
 	var listener Listener
 	listener = Listener{
-		fmt.Sprintf("%s_%d", eventName, e.Counter),
+		fmt.Sprintf("%s:%d", eventName, e.Counter),
 		func(val interface{}) {
 			fn(val)
 			e.OffEvent(eventName, listener)
@@ -39,16 +39,12 @@ func (e *Event) OnceEvent(eventName string, fn func(interface{})) {
 }
 
 func (e *Event) OffEvent(eventName string, fn Listener) {
-	index := -1
 	for i, item := range e.Listeners[eventName] {
 		if item.Id == fn.Id {
-			index = i
+			e.Listeners[eventName] = append(e.Listeners[eventName][:i], e.Listeners[eventName][i+1:]...)
+			return
 		}
 	}
-	if index == -1 {
-		return
-	}
-	e.Listeners[eventName] = append(e.Listeners[eventName][:index], e.Listeners[eventName][index+1:]...)
 }
 
 func (e *Event) TriggerEvent(eventName string, data interface{}) {
