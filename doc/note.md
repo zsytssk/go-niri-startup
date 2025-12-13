@@ -1,5 +1,14 @@
 ## 2025-12-12 09:18:44
 
+- @bug spad 功能，连续打开两个 chrome spad 会切换到 chrome 所在 workspace
+
+  - CurrentWorkspaceId 计算错误
+  - addWindow
+
+- 缺少 MoveWindowToIndex
+
+  - 将 spad 移动到 workspace 最后位置
+
 - 跨线程数据安全 -> event
 - @ques 还有哪些地方需要使用 lock
   - 发送命令？

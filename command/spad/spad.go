@@ -34,6 +34,7 @@ func Spad(w http.ResponseWriter, r *http.Request) {
 	windowFilter := state.UseWindowFilter(instance)
 	onWindowBlur := state.UseOnWindowBlur(instance)
 	matchFn := UseMatchFn(spadConf)
+	currentWorkspaceId := instance.CurrentWorkspaceId
 
 	var win *state.Window
 	wins := windowFilter(matchFn)
@@ -73,7 +74,10 @@ func Spad(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	currentWorkspaceId := instance.CurrentWorkspaceId
+	// fmt.Println(`test:>`, currentWorkspaceId, win.Title)
+	// if strings.Contains(win.Title, "DeepSeek") {
+	// 	return
+	// }
 	utils.NiriSendActionArr([]utils.Action{
 		{
 			MoveWindowToWorkspace: &utils.MoveWindowToWorkspace{
