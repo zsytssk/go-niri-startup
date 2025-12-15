@@ -162,6 +162,9 @@ func (s *State) addWorkspace(workspace Workspace) {
 }
 
 func (s *State) setCurWindowId(curId int) {
+	if curId == s.CurrentWindowId {
+		return
+	}
 	s.CurrentWindowId = curId
 
 	w, ok := s.Windows[curId]
@@ -174,7 +177,9 @@ func (s *State) setCurWindowId(curId int) {
 			s.setActiveWorkspace(workspaceId, curId, true)
 		}
 	}
-	s.TriggerEvent("FocusWindow", w)
+	if w != nil {
+		s.TriggerEvent("FocusWindow", w)
+	}
 }
 
 func (s *State) windowClose(id int) {
@@ -192,7 +197,7 @@ func (s *State) addWindow(window Window) {
 	s.Windows[window.ID] = &window
 	if window.IsFocused {
 		// @todo setTimeout
-		// s.setCurWindowId(window.ID)
+		s.setCurWindowId(window.ID)
 	}
 
 	if _, ok := s.OriginWindowInfo[window.ID]; !ok {

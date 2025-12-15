@@ -48,8 +48,8 @@ func UseWindowFilter(state *State) func(func(*Window) bool) []*Window {
 func UseOnWindowBlur(state *State) func(*Window, func()) func() {
 	return func(win *Window, fn func()) func() {
 		var off func()
-		off = state.OnEvent("WindowFocusChanged", func(obj interface{}) {
-			if obj.(EventStreamMsg).WindowFocusChanged.Id != win.ID {
+		off = state.OnEvent("FocusWindow", func(obj interface{}) {
+			if obj.(*Window).ID != win.ID {
 				fn()
 				off()
 			}
