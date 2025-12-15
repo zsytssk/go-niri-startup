@@ -5,6 +5,12 @@
   - CurrentWorkspaceId 计算错误
   - addWindow
 
+- @ques id 除了自增还有什么办法
+
+- @ques `niri-client` 跨线程可能会出的问题
+
+  - 用一个消息处理进出所有消息。。。
+
 - 缺少 MoveWindowToIndex
 
   - 将 spad 移动到 workspace 最后位置
