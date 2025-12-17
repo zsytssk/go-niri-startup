@@ -20,6 +20,8 @@ type Config struct {
 	SpadMap map[string]Spad `yaml:"spadMap"`
 }
 
+const SpadWorkspaceName = "spad"
+
 var (
 	config Config
 	once   sync.Once
