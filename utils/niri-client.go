@@ -118,6 +118,7 @@ func (c *Client) Send(msg interface{}) ([]byte, error) {
 		return nil, fmt.Errorf("未连接")
 	}
 	str, err := json.Marshal(msg)
+	// log.Println(`test:>Send`, string(str))
 	if err != nil {
 		return nil, err
 	}
@@ -126,6 +127,7 @@ func (c *Client) Send(msg interface{}) ([]byte, error) {
 
 	select {
 	case msg := <-c.ReviveMsgCh:
+		// log.Println(`test:>receive`, string(msg))
 		return msg, nil
 	case err := <-c.ReviveErrCh:
 		return nil, err

@@ -24,7 +24,7 @@ func getCmd() []string {
 const PORT = 6321
 
 func main() {
-	log.SetFlags(log.LstdFlags)
+	log.SetFlags(log.Ldate | log.Lmicroseconds | log.Lshortfile)
 	// 处理命令行参数
 	args := getCmd()
 	if len(args) > 0 {
