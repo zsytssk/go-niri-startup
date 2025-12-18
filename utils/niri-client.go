@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net"
 	"os"
 	"sync"
@@ -48,15 +49,15 @@ func (c *Client) Connect() {
 			default:
 			}
 
-			fmt.Println("尝试连接:", c.name, c.socketPath)
+			log.Println("尝试连接:", c.name, c.socketPath)
 			conn, err := net.Dial("unix", c.socketPath)
 			if err != nil {
-				fmt.Println("连接失败:", c.name, err)
+				log.Println("连接失败:", c.name, err)
 				time.Sleep(2 * time.Second)
 				continue
 			}
 
-			fmt.Println("已连接", c.name)
+			log.Println("已连接", c.name)
 			c.Conn = conn
 			select {
 			case c.Connected <- struct{}{}:
@@ -105,7 +106,7 @@ func (c *Client) Connect() {
 			c.Conn = nil
 
 			// 读失败后会回来这里继续重连
-			fmt.Println("连接断开，准备重连...", c.name)
+			log.Println("连接断开，准备重连...", c.name)
 			time.Sleep(2 * time.Second)
 		}
 	}()

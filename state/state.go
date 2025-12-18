@@ -35,7 +35,7 @@ func (s *State) BindEventStream() {
 			var data EventStreamMsg
 			json.Unmarshal(msg, &data)
 			s.TriggerEvent(msgType, data)
-			// fmt.Println(`test:>msg`, msgType, string(msg))
+			// log.Println(`test:>msg`, msgType, string(msg))
 			switch msgType {
 			case "WorkspacesChanged":
 				{

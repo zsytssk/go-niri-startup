@@ -74,10 +74,6 @@ func Spad(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// fmt.Println(`test:>`, currentWorkspaceId, win.Title)
-	// if strings.Contains(win.Title, "DeepSeek") {
-	// 	return
-	// }
 	utils.NiriSendActionArr([]utils.Action{
 		{
 			MoveWindowToWorkspace: &utils.MoveWindowToWorkspace{
