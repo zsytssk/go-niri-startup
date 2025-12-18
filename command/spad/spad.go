@@ -2,6 +2,7 @@ package spad
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"niri-startup/config"
 	"niri-startup/state"
@@ -67,11 +68,12 @@ func Spad(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		win, err = waitWindowOpen(matchFn)
-		updateSpadOriInfo(win.ID)
 		if err != nil {
+			log.Println("can't find open window for spad", req.Name)
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
+		updateSpadOriInfo(win.ID)
 	}
 
 	utils.NiriSendActionArr([]utils.Action{

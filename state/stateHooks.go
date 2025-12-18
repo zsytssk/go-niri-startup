@@ -110,6 +110,8 @@ func UseWorkspaceWindows(state *State) func(workspaceId int) []*Window {
 
 func UseUpdateSpadOriInfo(state *State) func(winId int) {
 	return func(winId int) {
+		state.mu.Lock()
+		defer state.mu.Unlock()
 		OriginWindowInfo := state.OriginWindowInfo
 		Workspaces := state.Workspaces
 
