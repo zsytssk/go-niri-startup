@@ -2,6 +2,7 @@ package spad
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"niri-startup/config"
 	"niri-startup/state"
@@ -11,8 +12,6 @@ import (
 type SpadReq struct {
 	Name string `json:"name"`
 }
-
-const SpadWorkspaceName = "spad"
 
 var BindFnMap = make(map[int]func(), 0)
 
@@ -33,6 +32,7 @@ func Spad(w http.ResponseWriter, r *http.Request) {
 	waitWindowOpen := state.UseWaitWindowOpen(instance)
 	windowFilter := state.UseWindowFilter(instance)
 	onWindowBlur := state.UseOnWindowBlur(instance)
+	updateSpadOriInfo := state.UseUpdateSpadOriInfo(instance)
 	matchFn := UseMatchFn(spadConf)
 	currentWorkspaceId := instance.CurrentWorkspaceId
 
@@ -50,7 +50,7 @@ func Spad(w http.ResponseWriter, r *http.Request) {
 					MoveWindowToWorkspace: &utils.MoveWindowToWorkspace{
 						WindowId:  win.ID,
 						Focus:     false,
-						Reference: utils.WindowReference{Name: SpadWorkspaceName},
+						Reference: utils.WindowReference{Name: config.SpadWorkspaceName},
 					},
 				},
 				{
@@ -69,15 +69,13 @@ func Spad(w http.ResponseWriter, r *http.Request) {
 		}
 		win, err = waitWindowOpen(matchFn)
 		if err != nil {
+			log.Println("can't find open window for spad", req.Name)
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
+		updateSpadOriInfo(win.ID)
 	}
 
-	// fmt.Println(`test:>`, currentWorkspaceId, win.Title)
-	// if strings.Contains(win.Title, "DeepSeek") {
-	// 	return
-	// }
 	utils.NiriSendActionArr([]utils.Action{
 		{
 			MoveWindowToWorkspace: &utils.MoveWindowToWorkspace{
@@ -116,7 +114,7 @@ func Spad(w http.ResponseWriter, r *http.Request) {
 				MoveWindowToWorkspace: &utils.MoveWindowToWorkspace{
 					WindowId:  win.ID,
 					Focus:     false,
-					Reference: utils.WindowReference{Name: SpadWorkspaceName},
+					Reference: utils.WindowReference{Name: config.SpadWorkspaceName},
 				},
 			},
 			{

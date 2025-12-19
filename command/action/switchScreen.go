@@ -5,18 +5,21 @@ import (
 	"niri-startup/utils"
 	"slices"
 	"sync/atomic"
+	"time"
 )
 
 var isSwitch atomic.Bool
 
 func SwitchScreen(changeSpace int) {
 
+	// log.Println(`test:>SwitchScreen:>1:>isSwitch`, isSwitch.Load())
 	instance := state.GetStateInstance()
 	workspaces := instance.Workspaces
 	curWorkspace, ok := workspaces[instance.CurrentWorkspaceId]
 	if !ok || isSwitch.Load() {
 		return
 	}
+	// log.Println(`test:>SwitchScreen:>2:>isSwitch`, isSwitch.Load())
 	isSwitch.Store(true)
 	curOutput := curWorkspace.Output
 	curIndex := slices.Index(instance.Outputs, curOutput)
@@ -100,5 +103,7 @@ func SwitchScreen(changeSpace int) {
 	utils.NiriSendActionArr(moveActions)
 	utils.NiriSendActionArr(focusActions)
 
+	// wait switch animation end
+	time.Sleep(150 * time.Millisecond)
 	isSwitch.Store(false)
 }

@@ -37,7 +37,7 @@ func GetCurWindow(write http.ResponseWriter, req ActionReq) {
 		utils.ReturnHttp(write, "")
 		return
 	}
-	// fmt.Println(`test:>`, req.Output, activeWindowId, instance.CurrentWindowId)
+	// log.Println(`test:>`, req.Output, activeWindowId, instance.CurrentWindowId)
 	utils.ReturnHttp(write, fmt.Sprintf(`%d/%d %s`, index+1, allNum, cur.Title))
 }
 

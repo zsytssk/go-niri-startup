@@ -4,8 +4,10 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net"
 	"os"
+	"sync"
 	"time"
 )
 
@@ -40,18 +42,6 @@ func NewClient(name string) Client {
 func (c *Client) Connect() {
 
 	go func() {
-		for msg := range c.SendMsgCh {
-			_, err := fmt.Fprintf(c.Conn, "%s\n", msg)
-			if err != nil {
-				select {
-				case c.ReviveErrCh <- err:
-				default:
-				}
-			}
-		}
-	}()
-
-	go func() {
 		for {
 			select {
 			case <-c.quit:
@@ -59,28 +49,47 @@ func (c *Client) Connect() {
 			default:
 			}
 
-			fmt.Println("尝试连接:", c.name, c.socketPath)
+			log.Println("尝试连接:", c.name, c.socketPath)
 			conn, err := net.Dial("unix", c.socketPath)
 			if err != nil {
-				fmt.Println("连接失败:", c.name, err)
+				log.Println("连接失败:", c.name, err)
 				time.Sleep(2 * time.Second)
 				continue
 			}
 
+			log.Println("已连接", c.name)
 			c.Conn = conn
-
-			fmt.Println("已连接", c.name)
 			select {
 			case c.Connected <- struct{}{}:
 			default:
 			}
-			reader := bufio.NewReader(c.Conn)
+
+			var wg sync.WaitGroup
+			wg.Add(1)
+			breakCh := make(chan struct{})
+			go func() {
+				defer wg.Done()
+
+				for msg := range c.SendMsgCh {
+					select {
+					case <-breakCh:
+						return
+					default:
+					}
+					_, err := fmt.Fprintf(conn, "%s\n", msg)
+					if err != nil {
+						select {
+						case c.ReviveErrCh <- err:
+						default:
+						}
+					}
+				}
+			}()
+
+			reader := bufio.NewReader(conn)
 			for {
 				line, err := reader.ReadBytes('\n')
 				if err != nil { // 远端断开或 socket 被关闭
-					_ = c.Conn.Close()
-					c.Conn = nil
-
 					break
 				}
 
@@ -91,8 +100,13 @@ func (c *Client) Connect() {
 
 			}
 
+			close(breakCh)
+			wg.Wait()
+			conn.Close()
+			c.Conn = nil
+
 			// 读失败后会回来这里继续重连
-			fmt.Println("连接断开，准备重连...", c.name)
+			log.Println("连接断开，准备重连...", c.name)
 			time.Sleep(2 * time.Second)
 		}
 	}()
@@ -104,6 +118,7 @@ func (c *Client) Send(msg interface{}) ([]byte, error) {
 		return nil, fmt.Errorf("未连接")
 	}
 	str, err := json.Marshal(msg)
+	// log.Println(`test:>Send`, string(str))
 	if err != nil {
 		return nil, err
 	}
@@ -112,6 +127,7 @@ func (c *Client) Send(msg interface{}) ([]byte, error) {
 
 	select {
 	case msg := <-c.ReviveMsgCh:
+		// log.Println(`test:>receive`, string(msg))
 		return msg, nil
 	case err := <-c.ReviveErrCh:
 		return nil, err

@@ -1,9 +1,16 @@
 ## 2025-12-12 09:18:44
 
+- 感觉没有什么好办法可以解决这个问题
+
+  - http 三次握手？
+  - go 模拟单线程模型？
+
 - @bug spad 功能，连续打开两个 chrome spad 会切换到 chrome 所在 workspace
 
   - CurrentWorkspaceId 计算错误
   - addWindow
+
+- @ques 如何让一个 ch 依赖一个 ch
 
 - @ques id 除了自增还有什么办法
 

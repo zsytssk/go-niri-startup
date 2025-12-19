@@ -2,6 +2,7 @@ package state
 
 import (
 	"fmt"
+	"niri-startup/config"
 	"slices"
 	"time"
 )
@@ -104,5 +105,32 @@ func UseWorkspaceWindows(state *State) func(workspaceId int) []*Window {
 		})
 
 		return result
+	}
+}
+
+func UseUpdateSpadOriInfo(state *State) func(winId int) {
+	return func(winId int) {
+		state.mu.Lock()
+		defer state.mu.Unlock()
+		OriginWindowInfo := state.OriginWindowInfo
+		Workspaces := state.Workspaces
+
+		var workspaceId int
+		for _, w := range Workspaces {
+			if w.Name == nil {
+				continue
+			}
+			if *w.Name == config.SpadWorkspaceName {
+				workspaceId = w.ID
+				break
+			}
+		}
+
+		if workspaceId == 0 {
+			return
+		}
+
+		OriginWindowInfo[winId].Workspace = workspaceId
+
 	}
 }

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"niri-startup/utils"
 	"slices"
+	"sync"
 )
 
 type OriginWorkspaceInfo struct {
@@ -24,6 +25,7 @@ type State struct {
 	OriginWindowInfo    map[int]*OriginWindowInfo
 	Client              utils.Client
 	*utils.Event        `json:"-"`
+	mu                  sync.RWMutex `json:"-"`
 }
 
 func (s *State) BindEventStream() {
@@ -31,70 +33,77 @@ func (s *State) BindEventStream() {
 		<-s.Client.Connected
 		s.Client.Send("EventStream")
 		for msg := range s.Client.ReviveMsgCh {
-			msgType := utils.GetMsgType(msg)
-			var data EventStreamMsg
-			json.Unmarshal(msg, &data)
-			s.TriggerEvent(msgType, data)
-			// fmt.Println(`test:>msg`, msgType, string(msg))
-			switch msgType {
-			case "WorkspacesChanged":
-				{
-					s.Workspaces = make(map[int]*Workspace, 0)
-					s.outputsChange(data.WorkspacesChanged.Workspaces)
-					for _, m := range data.WorkspacesChanged.Workspaces {
-						s.addWorkspace(m)
-					}
-				}
-			case "WorkspaceActivated":
-				{
-					w := data.WorkspaceActivated
-					s.setActiveWorkspace(
-						w.Id,
-						0,
-						w.Focused,
-					)
-				}
-			case "WindowsChanged":
-				{
-					s.Windows = make(map[int]*Window, 0)
-					wins := data.WindowsChanged.Windows
-					for _, wi := range wins {
-						s.addWindow(wi)
-					}
-				}
-			case "WindowClosed":
-				{
-					s.windowClose(data.WindowClosed.Id)
-				}
-			case "OverviewOpenedOrClosed":
-				{
-					s.OverviewOpen = data.OverviewOpenedOrClosed.IsOpen
-				}
-			case "WindowOpenedOrChanged":
-				{
-					s.addWindow(data.WindowOpenedOrChanged.Window)
-				}
-			case "WindowFocusChanged":
-				{
-					s.setCurWindowId(data.WindowFocusChanged.Id)
-				}
-			case "WindowLayoutsChanged":
-				{
-					for _, w := range data.WindowLayoutsChanged.Changes {
+			s.handleMsg(msg)
+		}
+	}()
+}
 
-						var id int
-						json.Unmarshal(w[0], &id)
-						var layout WindowLayout
-						json.Unmarshal(w[1], &layout)
+func (s *State) handleMsg(msg []byte) {
+	msgType := utils.GetMsgType(msg)
+	var data EventStreamMsg
+	json.Unmarshal(msg, &data)
+	s.TriggerEvent(msgType, data)
 
-						if w, ok := s.Windows[id]; ok {
-							w.Layout = layout
-						}
-					}
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	// log.Println(`test:>msg`, msgType, string(msg))
+	switch msgType {
+	case "WorkspacesChanged":
+		{
+			s.Workspaces = make(map[int]*Workspace, 0)
+			s.outputsChange(data.WorkspacesChanged.Workspaces)
+			for _, m := range data.WorkspacesChanged.Workspaces {
+				s.addWorkspace(m)
+			}
+		}
+	case "WorkspaceActivated":
+		{
+			w := data.WorkspaceActivated
+			s.setActiveWorkspace(
+				w.Id,
+				0,
+				w.Focused,
+			)
+		}
+	case "WindowsChanged":
+		{
+			s.Windows = make(map[int]*Window, 0)
+			wins := data.WindowsChanged.Windows
+			for _, wi := range wins {
+				s.addWindow(wi)
+			}
+		}
+	case "WindowClosed":
+		{
+			s.windowClose(data.WindowClosed.Id)
+		}
+	case "OverviewOpenedOrClosed":
+		{
+			s.OverviewOpen = data.OverviewOpenedOrClosed.IsOpen
+		}
+	case "WindowOpenedOrChanged":
+		{
+			s.addWindow(data.WindowOpenedOrChanged.Window)
+		}
+	case "WindowFocusChanged":
+		{
+			s.setCurWindowId(data.WindowFocusChanged.Id)
+		}
+	case "WindowLayoutsChanged":
+		{
+			for _, w := range data.WindowLayoutsChanged.Changes {
+
+				var id int
+				json.Unmarshal(w[0], &id)
+				var layout WindowLayout
+				json.Unmarshal(w[1], &layout)
+
+				if w, ok := s.Windows[id]; ok {
+					w.Layout = layout
 				}
 			}
 		}
-	}()
+	}
 }
 
 func (s *State) setActiveWorkspace(curId int, activeWindowId int, focus bool) {
