@@ -150,15 +150,16 @@ func UseWorkspaceChangeComplete(state *State) func([]ChangeWorkspaceInfo) chan s
 		offFn = instance.OnEvent("WorkspacesChanged", func(i interface{}) {
 			info := i.(EventStreamMsg)
 			workspaces := info.WorkspacesChanged.Workspaces
+			wsMap := make(map[int]Workspace, len(workspaces))
+			for _, ws := range workspaces {
+				wsMap[ws.ID] = ws
+			}
+
 			for _, item := range changes {
-				matchIndex := slices.IndexFunc(workspaces, func(i Workspace) bool {
-					return i.ID == item.ID
-				})
-				if matchIndex == -1 {
+				matchItem, ok := wsMap[item.ID]
+				if !ok {
 					continue
 				}
-
-				matchItem := workspaces[matchIndex]
 				if matchItem.Idx != item.Idx ||
 					matchItem.Output != item.Output {
 					return
@@ -166,7 +167,7 @@ func UseWorkspaceChangeComplete(state *State) func([]ChangeWorkspaceInfo) chan s
 			}
 
 			offFn()
-			ch <- struct{}{}
+			close(ch)
 		})
 
 		return ch
