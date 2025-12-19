@@ -2,7 +2,6 @@ package state
 
 import (
 	"fmt"
-	"log"
 	"niri-startup/config"
 	"slices"
 	"time"
@@ -147,29 +146,26 @@ func UseWorkspaceChangeComplete(state *State) func([]ChangeWorkspaceInfo) chan s
 	return func(changes []ChangeWorkspaceInfo) chan struct{} {
 		instance := GetStateInstance()
 		ch := make(chan struct{}, 1)
-		instance.OnEvent("WorkspacesChanged", func(i interface{}) {
+		var offFn func()
+		offFn = instance.OnEvent("WorkspacesChanged", func(i interface{}) {
 			info := i.(EventStreamMsg)
 			workspaces := info.WorkspacesChanged.Workspaces
 			for _, item := range changes {
 				matchIndex := slices.IndexFunc(workspaces, func(i Workspace) bool {
 					return i.ID == item.ID
 				})
-				// log.Println(`test:>UseWorkspaceChangeComplete`, item.ID, matchIndex)
 				if matchIndex == -1 {
 					continue
 				}
+
 				matchItem := workspaces[matchIndex]
-				// if matchItem.Idx != item.Idx ||
-				// 	matchItem.IsActive != item.IsActive ||
-				// 	matchItem.Output != item.Output {
-				// 	return
-				// }
-				log.Println(`test:>UseWorkspaceChangeComplete`, matchItem.Output, item.Output)
-				if matchItem.Output != item.Output {
+				if matchItem.Idx != item.Idx ||
+					matchItem.Output != item.Output {
 					return
 				}
 			}
 
+			offFn()
 			ch <- struct{}{}
 		})
 
