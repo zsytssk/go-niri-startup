@@ -2,6 +2,7 @@ package state
 
 import (
 	"fmt"
+	"log"
 	"niri-startup/config"
 	"slices"
 	"time"
@@ -132,5 +133,46 @@ func UseUpdateSpadOriInfo(state *State) func(winId int) {
 
 		OriginWindowInfo[winId].Workspace = workspaceId
 
+	}
+}
+
+type ChangeWorkspaceInfo struct {
+	ID       int
+	Output   string
+	Idx      int
+	IsActive bool
+}
+
+func UseWorkspaceChangeComplete(state *State) func([]ChangeWorkspaceInfo) chan struct{} {
+	return func(changes []ChangeWorkspaceInfo) chan struct{} {
+		instance := GetStateInstance()
+		ch := make(chan struct{}, 1)
+		instance.OnEvent("WorkspacesChanged", func(i interface{}) {
+			info := i.(EventStreamMsg)
+			workspaces := info.WorkspacesChanged.Workspaces
+			for _, item := range changes {
+				matchIndex := slices.IndexFunc(workspaces, func(i Workspace) bool {
+					return i.ID == item.ID
+				})
+				// log.Println(`test:>UseWorkspaceChangeComplete`, item.ID, matchIndex)
+				if matchIndex == -1 {
+					continue
+				}
+				matchItem := workspaces[matchIndex]
+				// if matchItem.Idx != item.Idx ||
+				// 	matchItem.IsActive != item.IsActive ||
+				// 	matchItem.Output != item.Output {
+				// 	return
+				// }
+				log.Println(`test:>UseWorkspaceChangeComplete`, matchItem.Output, item.Output)
+				if matchItem.Output != item.Output {
+					return
+				}
+			}
+
+			ch <- struct{}{}
+		})
+
+		return ch
 	}
 }

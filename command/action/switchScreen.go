@@ -1,25 +1,25 @@
 package action
 
 import (
+	"log"
 	"niri-startup/state"
 	"niri-startup/utils"
 	"slices"
 	"sync/atomic"
-	"time"
 )
 
 var isSwitch atomic.Bool
 
 func SwitchScreen(changeSpace int) {
 
-	// log.Println(`test:>SwitchScreen:>1:>isSwitch`, isSwitch.Load())
+	log.Println(`test:>SwitchScreen:>1:>isSwitch`, isSwitch.Load())
 	instance := state.GetStateInstance()
+	waitWorkspaceChangeComplete := state.UseWorkspaceChangeComplete(instance)
 	workspaces := instance.Workspaces
 	curWorkspace, ok := workspaces[instance.CurrentWorkspaceId]
 	if !ok || isSwitch.Load() {
 		return
 	}
-	// log.Println(`test:>SwitchScreen:>2:>isSwitch`, isSwitch.Load())
 	isSwitch.Store(true)
 	curOutput := curWorkspace.Output
 	curIndex := slices.Index(instance.Outputs, curOutput)
@@ -56,6 +56,7 @@ func SwitchScreen(changeSpace int) {
 
 	moveActions := []utils.Action{}
 	focusActions := []utils.Action{}
+	changeList := make([]state.ChangeWorkspaceInfo, 0)
 	for _, workspace := range append(nextOutputWorkspaces, curOutputWorkspaces...) {
 		var goOutput string
 		if workspace.Output == curOutput {
@@ -63,6 +64,12 @@ func SwitchScreen(changeSpace int) {
 		} else {
 			goOutput = curOutput
 		}
+		changeList = append(changeList, state.ChangeWorkspaceInfo{
+			ID:       workspace.ID,
+			Output:   goOutput,
+			Idx:      workspace.Idx,
+			IsActive: workspace.IsActive,
+		})
 		actions := []utils.Action{
 			{
 				MoveWorkspaceToMonitor: &utils.MoveWorkspaceToMonitor{
@@ -100,10 +107,13 @@ func SwitchScreen(changeSpace int) {
 		}
 		moveActions = append(moveActions, actions...)
 	}
+	ch := waitWorkspaceChangeComplete(changeList)
 	utils.NiriSendActionArr(moveActions)
 	utils.NiriSendActionArr(focusActions)
 
 	// wait switch animation end
-	time.Sleep(150 * time.Millisecond)
+	// time.Sleep(150 * time.Millisecond)
+	<-ch
 	isSwitch.Store(false)
+	log.Println(`test:>SwitchScreen:>2:>isSwitch`, isSwitch.Load())
 }
