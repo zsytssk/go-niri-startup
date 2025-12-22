@@ -10,3 +10,9 @@ spadMap:
     appId: "chrome-cadlkienfkclaiaibeoongdcgmdikeeg-Default"
     height: 900
     width: 1200
+
+  calculator:
+    cmd: "gnome-calculator"
+    appId: "org.gnome.Calculator"
+    height: 600
+    width: 364

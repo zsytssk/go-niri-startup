@@ -55,7 +55,9 @@ func (s *State) handleMsg(msg []byte) {
 			for _, m := range data.WorkspacesChanged.Workspaces {
 				s.addWorkspace(m)
 			}
+			s.TriggerEvent("localWorkspacesChanged", s.Workspaces)
 		}
+
 	case "WorkspaceActivated":
 		{
 			w := data.WorkspaceActivated
@@ -64,6 +66,7 @@ func (s *State) handleMsg(msg []byte) {
 				0,
 				w.Focused,
 			)
+			s.TriggerEvent("localWorkspacesChanged", s.Workspaces)
 		}
 	case "WindowsChanged":
 		{

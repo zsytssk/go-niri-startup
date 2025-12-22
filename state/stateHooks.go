@@ -147,12 +147,11 @@ func UseWorkspaceChangeComplete(state *State) func([]ChangeWorkspaceInfo) chan s
 		instance := GetStateInstance()
 		ch := make(chan struct{}, 1)
 		var offFn func()
-		offFn = instance.OnEvent("WorkspacesChanged", func(i interface{}) {
-			info := i.(EventStreamMsg)
-			workspaces := info.WorkspacesChanged.Workspaces
+		offFn = instance.OnEvent("localWorkspacesChanged", func(i interface{}) {
+			workspaces := i.(map[int]*Workspace)
 			wsMap := make(map[int]Workspace, len(workspaces))
 			for _, ws := range workspaces {
-				wsMap[ws.ID] = ws
+				wsMap[ws.ID] = *ws
 			}
 
 			for _, item := range changes {
@@ -160,8 +159,14 @@ func UseWorkspaceChangeComplete(state *State) func([]ChangeWorkspaceInfo) chan s
 				if !ok {
 					continue
 				}
+
 				if matchItem.Idx != item.Idx ||
-					matchItem.Output != item.Output {
+					matchItem.Output != item.Output ||
+					item.IsActive != matchItem.IsActive {
+					return
+				}
+
+				if item.IsActive != matchItem.IsActive {
 					return
 				}
 			}
