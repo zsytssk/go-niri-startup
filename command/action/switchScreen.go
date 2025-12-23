@@ -10,7 +10,6 @@ import (
 var isSwitch atomic.Bool
 
 func SwitchScreen(changeSpace int) {
-
 	// log.Println(`test:>SwitchScreen:>1:>isSwitch`, isSwitch.Load())
 	instance := state.GetStateInstance()
 	waitWorkspaceChangeComplete := state.UseWorkspaceChangeComplete(instance)

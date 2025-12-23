@@ -149,13 +149,9 @@ func UseWorkspaceChangeComplete(state *State) func([]ChangeWorkspaceInfo) chan s
 		var offFn func()
 		offFn = instance.OnEvent("localWorkspacesChanged", func(i interface{}) {
 			workspaces := i.(map[int]*Workspace)
-			wsMap := make(map[int]Workspace, len(workspaces))
-			for _, ws := range workspaces {
-				wsMap[ws.ID] = *ws
-			}
 
 			for _, item := range changes {
-				matchItem, ok := wsMap[item.ID]
+				matchItem, ok := workspaces[item.ID]
 				if !ok {
 					continue
 				}
