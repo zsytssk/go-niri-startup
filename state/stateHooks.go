@@ -146,6 +146,8 @@ func UseWorkspaceChangeComplete(state *State) func([]ChangeWorkspaceInfo) chan s
 	return func(changes []ChangeWorkspaceInfo) chan struct{} {
 		instance := GetStateInstance()
 		ch := make(chan struct{}, 1)
+		done := make(chan struct{})
+
 		var offFn func()
 		offFn = instance.OnEvent("localWorkspacesChanged", func(i interface{}) {
 			workspaces := i.(map[int]*Workspace)
@@ -168,8 +170,19 @@ func UseWorkspaceChangeComplete(state *State) func([]ChangeWorkspaceInfo) chan s
 			}
 
 			offFn()
-			close(ch)
+			close(done)
 		})
+
+		go func() {
+			select {
+			case <-done:
+				offFn()
+				close(ch)
+			case <-time.After(2 * time.Second):
+				offFn()
+				close(ch)
+			}
+		}()
 
 		return ch
 	}

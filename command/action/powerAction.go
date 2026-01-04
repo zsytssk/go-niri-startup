@@ -1,10 +1,20 @@
 package action
 
 import (
+	"fmt"
 	"niri-startup/state"
 	"niri-startup/utils"
 	"time"
 )
+
+func runConfirm(tip string) bool {
+	cmd := fmt.Sprintf(`if zenity --question --text="%s" --title="问题"; then echo "Y"; else echo "N"; fi`, tip)
+	r, err := utils.RunCMD(cmd, false)
+	if err != nil || r == "N" {
+		return false
+	}
+	return true
+}
 
 func PowerAction() error {
 	result, err := utils.RunCMD(`printf "󰌾 Lock\n󰍃 Logout\n󰙧 Shutdown\n󰑐 Reboot\n󰚰 Update" | fuzzel -d -p "请选择: "`, false)
@@ -24,13 +34,15 @@ func PowerAction() error {
 		return nil
 	}
 	if result == "󰑐 Reboot" {
-		utils.RunCMD(`zenity --question --text="确定要重启吗？"`, false)
-		utils.RunCMD("reboot", false)
+		if runConfirm(`确定要重启吗？`) {
+			utils.RunCMD("reboot", false)
+		}
 		return nil
 	}
 	if result == "󰙧 Shutdown" {
-		utils.RunCMD(`zenity --question --text="确定要关机吗？"`, false)
-		utils.RunCMD("shutdown -h now", false)
+		if runConfirm(`确定要关机吗？`) {
+			utils.RunCMD("shutdown -h now", false)
+		}
 		return nil
 	}
 	if result == "󰚰 Update" {
