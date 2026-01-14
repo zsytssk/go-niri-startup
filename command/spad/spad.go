@@ -95,9 +95,6 @@ func Spad(w http.ResponseWriter, r *http.Request) {
 			},
 		},
 		{
-			MoveWindowToFloating: &utils.WindowWithId{Id: win.ID},
-		},
-		{
 			FocusWindow: &utils.WindowWithId{Id: win.ID},
 		},
 		{Sleep: 80},
