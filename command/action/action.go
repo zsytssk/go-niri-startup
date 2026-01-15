@@ -56,6 +56,8 @@ func Action(w http.ResponseWriter, r *http.Request) {
 		SwitchScreen(1)
 	case "pick-color":
 		PickColor()
+	case "toggle-picture-in-picture":
+		togglePictureInPicture()
 	case "reset-state":
 		ResetState()
 	}
