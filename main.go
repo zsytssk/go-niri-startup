@@ -40,6 +40,9 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
+	os.Stdout.WriteString("\n")
+	log.Println("启动niri-startup")
 	state.GetStateInstance()
 	utils.GetSocketInstance()
 	utils.RunCMD("notify-send 启动 niri-ts-startup!", false)
