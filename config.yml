@@ -6,7 +6,7 @@ spadMap:
     width: 1200
 
   chatgpt:
-    cmd: 'google-chrome-stable --app-id="cadlkienfkclaiaibeoongdcgmdikeeg"'
+    cmd: 'google-chrome --app-id="cadlkienfkclaiaibeoongdcgmdikeeg"'
     appId: "chrome-cadlkienfkclaiaibeoongdcgmdikeeg-Default"
     height: 900
     width: 1200
