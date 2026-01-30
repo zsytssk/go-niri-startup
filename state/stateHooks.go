@@ -9,11 +9,16 @@ import (
 
 func UseWaitWindowOpen(state *State) func(func(*Window) bool) (*Window, error) {
 	return func(filterFn func(*Window) bool) (*Window, error) {
+		state.mu.RLock()
+
 		for _, w := range state.Windows {
 			if filterFn(w) {
+				state.mu.RUnlock()
 				return w, nil
 			}
 		}
+
+		state.mu.RUnlock()
 
 		ch := make(chan *Window, 1)
 		var off func()
@@ -37,6 +42,8 @@ func UseWaitWindowOpen(state *State) func(func(*Window) bool) (*Window, error) {
 
 func UseWindowFilter(state *State) func(func(*Window) bool) []*Window {
 	return func(filterFn func(*Window) bool) []*Window {
+		state.mu.RLock()
+		defer state.mu.RUnlock()
 		wins := make([]*Window, 0)
 		for _, w := range state.Windows {
 			if filterFn(w) {
@@ -132,7 +139,11 @@ func UseUpdateSpadOriInfo(state *State) func(winId int) {
 			return
 		}
 
-		OriginWindowInfo[winId].Workspace = workspaceId
+		owi, ok := OriginWindowInfo[winId]
+		if !ok {
+			return
+		}
+		owi.Workspace = workspaceId
 
 	}
 }
@@ -149,8 +160,7 @@ func UseWorkspaceChangeComplete(state *State) func([]ChangeWorkspaceInfo) chan s
 		ch := make(chan struct{}, 1)
 		done := make(chan struct{})
 
-		var offFn func()
-		offFn = state.OnEvent("localWorkspacesChanged", func(i interface{}) {
+		offFn := state.OnEvent("localWorkspacesChanged", func(i interface{}) {
 			workspaces := i.(map[int]*Workspace)
 
 			for _, item := range changes {
@@ -170,17 +180,15 @@ func UseWorkspaceChangeComplete(state *State) func([]ChangeWorkspaceInfo) chan s
 				}
 			}
 
-			offFn()
 			close(done)
 		})
+		defer offFn()
 
 		go func() {
 			select {
 			case <-done:
-				offFn()
 				close(ch)
 			case <-time.After(2 * time.Second):
-				offFn()
 				close(ch)
 			}
 		}()

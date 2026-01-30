@@ -36,8 +36,12 @@ func (e *Event) OnEvent(eventName string, fn func(interface{})) func() {
 	}
 	e.listeners[eventName][id] = listener
 	e.mu.Unlock()
+
+	var once sync.Once
 	return func() {
-		e.OffEvent(eventName, id)
+		once.Do(func() {
+			e.OffEvent(eventName, id)
+		})
 	}
 }
 
