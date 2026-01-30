@@ -42,7 +42,7 @@ func (s *State) handleMsg(msg []byte) {
 	msgType := utils.GetMsgType(msg)
 	var data EventStreamMsg
 	json.Unmarshal(msg, &data)
-	s.TriggerEvent(msgType, data)
+	defer s.TriggerEvent(msgType, data)
 
 	s.mu.Lock()
 	defer s.mu.Unlock()
