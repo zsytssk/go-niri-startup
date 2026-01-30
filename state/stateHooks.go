@@ -21,20 +21,19 @@ func UseWaitWindowOpen(state *State) func(func(*Window) bool) (*Window, error) {
 		state.mu.RUnlock()
 
 		ch := make(chan *Window, 1)
-		var off func()
-		off = state.OnEvent("WindowOpenedOrChanged", func(msg interface{}) {
+		off := state.OnEvent("WindowOpenedOrChanged", func(msg interface{}) {
 			w := &msg.(EventStreamMsg).WindowOpenedOrChanged.Window
 			if filterFn(w) {
 				ch <- w
-				off()
 			}
 		})
+		defer off()
 
 		select {
 		case w := <-ch:
 			return w, nil
 		case <-time.After(3 * time.Second):
-			off() // 超时也取消事件监听
+			// 超时也取消事件监听
 			return nil, fmt.Errorf("timeout waiting for window")
 		}
 	}
@@ -191,6 +190,7 @@ func UseWorkspaceChangeComplete(state *State) func([]ChangeWorkspaceInfo) chan s
 			case <-time.After(2 * time.Second):
 				close(ch)
 			}
+			offFn()
 		}()
 
 		return ch
