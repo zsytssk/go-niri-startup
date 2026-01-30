@@ -9,7 +9,8 @@ import (
 
 func GetState(w http.ResponseWriter, r *http.Request) {
 	instance := state.GetStateInstance()
-	str, err := json.Marshal(instance.CurrentWorkspaceId)
+	view := instance.GetSnapshot()
+	str, err := json.Marshal(view)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return

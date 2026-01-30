@@ -11,9 +11,10 @@ import (
 func GetCurWindow(write http.ResponseWriter, req ActionReq) {
 	bindActiveWindowChange(req)
 	instance := state.GetStateInstance()
+	view := instance.GetSnapshot()
 	getWindows := state.UseWorkspaceWindows(instance)
-	windows := instance.Windows
-	workspaces := instance.Workspaces
+	windows := view.Windows
+	workspaces := view.Workspaces
 
 	var activeWindowId int
 	var workspaceWindows []*state.Window
@@ -55,10 +56,10 @@ func bindActiveWindowChange(req ActionReq) {
 			utils.RunCMD(fmt.Sprintf(`pkill -RTMIN+%d waybar`, req.Signal), false)
 			return
 		}
-		_, ok := instance.Workspaces[w.WorkspaceID]
-		if !ok {
-			return
-		}
+		// _, ok := instance.Workspaces[w.WorkspaceID]
+		// if !ok {
+		// 	return
+		// }
 		utils.RunCMD(fmt.Sprintf(`pkill -RTMIN+%d waybar`, req.Signal), false)
 	})
 }

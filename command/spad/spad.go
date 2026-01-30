@@ -29,12 +29,13 @@ func Spad(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
 	instance := state.GetStateInstance()
+	view := state.GetStateSnapshot()
 	waitWindowOpen := state.UseWaitWindowOpen(instance)
 	windowFilter := state.UseWindowFilter(instance)
 	onWindowBlur := state.UseOnWindowBlur(instance)
 	updateSpadOriInfo := state.UseUpdateSpadOriInfo(instance)
 	matchFn := UseMatchFn(spadConf)
-	currentWorkspaceId := instance.CurrentWorkspaceId
+	currentWorkspaceId := view.CurrentWorkspaceId
 
 	var win *state.Window
 	wins := windowFilter(matchFn)

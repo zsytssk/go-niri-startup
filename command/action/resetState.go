@@ -6,12 +6,12 @@ import (
 )
 
 func ResetState() {
-	instance := state.GetStateInstance()
-	CurrentWindowId := instance.CurrentWindowId
-	Windows := instance.Windows
-	Workspaces := instance.Workspaces
-	OriginWindowInfo := instance.OriginWindowInfo
-	OriginWorkspaceInfo := instance.OriginWorkspaceInfo
+	view := state.GetStateSnapshot()
+	CurrentWindowId := view.CurrentWindowId
+	Windows := view.Windows
+	Workspaces := view.Workspaces
+	OriginWindowInfo := view.OriginWindowInfo
+	OriginWorkspaceInfo := view.OriginWorkspaceInfo
 
 	activeWorkspaces := make([]*state.Workspace, 0)
 

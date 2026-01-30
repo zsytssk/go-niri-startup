@@ -52,13 +52,14 @@ func PowerAction() error {
 		)
 		instance := state.GetStateInstance()
 		waitWindowOpen := state.UseWaitWindowOpen(instance)
+		view := instance.GetSnapshot()
 		item, err := waitWindowOpen(func(w *state.Window) bool {
 			return w.AppId == "update.ghostty"
 		})
 		if err != nil {
 			return err
 		}
-		currentWorkspaceId := instance.CurrentWorkspaceId
+		currentWorkspaceId := view.CurrentWorkspaceId
 		utils.NiriSendActionArr([]utils.Action{
 			{
 				MoveWindowToWorkspace: &utils.MoveWindowToWorkspace{

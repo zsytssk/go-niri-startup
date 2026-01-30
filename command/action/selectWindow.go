@@ -20,10 +20,10 @@ type WindowInfo struct {
 }
 
 func SelectWindow() error {
-	instance := state.GetStateInstance()
-	workspace := instance.Workspaces
-	windows := instance.Windows
-	outputs := instance.Outputs
+	view := state.GetStateSnapshot()
+	workspace := view.Workspaces
+	windows := view.Windows
+	outputs := view.Outputs
 
 	wins := make([]WindowInfo, 0)
 	for _, w := range windows {

@@ -13,22 +13,23 @@ func SwitchScreen(changeSpace int) {
 	// log.Println(`test:>SwitchScreen:>1:>isSwitch`, isSwitch.Load())
 	instance := state.GetStateInstance()
 	waitWorkspaceChangeComplete := state.UseWorkspaceChangeComplete(instance)
-	workspaces := instance.Workspaces
-	curWorkspace, ok := workspaces[instance.CurrentWorkspaceId]
+	view := instance.GetSnapshot()
+	workspaces := view.Workspaces
+	curWorkspace, ok := workspaces[view.CurrentWorkspaceId]
 	if !ok || isSwitch.Load() {
 		return
 	}
 	isSwitch.Store(true)
 	curOutput := curWorkspace.Output
-	curIndex := slices.Index(instance.Outputs, curOutput)
+	curIndex := slices.Index(view.Outputs, curOutput)
 	nextIndex := curIndex + changeSpace
 
-	if nextIndex >= len(instance.Outputs) {
+	if nextIndex >= len(view.Outputs) {
 		nextIndex = 0
 	} else if nextIndex < 0 {
-		nextIndex = len(instance.Outputs) - 1
+		nextIndex = len(view.Outputs) - 1
 	}
-	nextOutput := instance.Outputs[nextIndex]
+	nextOutput := view.Outputs[nextIndex]
 	if !ok {
 		return
 	}

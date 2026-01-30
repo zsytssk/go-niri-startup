@@ -84,6 +84,8 @@ func UseWaitScreenShot(state *State) func() string {
 
 func UseWorkspaceWindows(state *State) func(workspaceId int) []*Window {
 	return func(workspaceId int) []*Window {
+		state.mu.RLock()
+		defer state.mu.RUnlock()
 		result := make([]*Window, 0)
 		windows := state.Windows
 
@@ -144,12 +146,11 @@ type ChangeWorkspaceInfo struct {
 
 func UseWorkspaceChangeComplete(state *State) func([]ChangeWorkspaceInfo) chan struct{} {
 	return func(changes []ChangeWorkspaceInfo) chan struct{} {
-		instance := GetStateInstance()
 		ch := make(chan struct{}, 1)
 		done := make(chan struct{})
 
 		var offFn func()
-		offFn = instance.OnEvent("localWorkspacesChanged", func(i interface{}) {
+		offFn = state.OnEvent("localWorkspacesChanged", func(i interface{}) {
 			workspaces := i.(map[int]*Workspace)
 
 			for _, item := range changes {

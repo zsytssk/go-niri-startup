@@ -11,12 +11,13 @@ var (
 )
 
 func GetStateInstance() *State {
-
 	once.Do(func() {
 		create()
 	})
 	return &StateInstance
-
+}
+func GetStateSnapshot() StateView {
+	return GetStateInstance().GetSnapshot()
 }
 
 func create() {
@@ -26,8 +27,8 @@ func create() {
 		Workspaces:          make(map[int]*Workspace, 0),
 		OriginWorkspaceInfo: make(map[int]*OriginWorkspaceInfo, 0),
 		OriginWindowInfo:    make(map[int]*OriginWindowInfo, 0),
-		Event:               utils.NewEvent(),
 		Client:              utils.NewClient("EventStreamClient"),
+		Event:               utils.NewEvent(),
 	}
 	StateInstance.Client.Connect()
 	StateInstance.BindEventStream()

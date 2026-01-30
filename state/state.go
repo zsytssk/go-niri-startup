@@ -14,6 +14,17 @@ type OriginWorkspaceInfo struct {
 type OriginWindowInfo struct {
 	Workspace int
 }
+type StateView struct {
+	Outputs             []string
+	CurrentWindowId     int
+	CurrentWorkspaceId  int
+	OverviewOpen        bool
+	Windows             map[int]*Window
+	Workspaces          map[int]*Workspace
+	OriginWorkspaceInfo map[int]*OriginWorkspaceInfo
+	OriginWindowInfo    map[int]*OriginWindowInfo
+	Client              utils.Client
+}
 type State struct {
 	Outputs             []string
 	CurrentWindowId     int
@@ -260,5 +271,21 @@ func (s *State) outputsChange(workspaces []Workspace) {
 
 	for _, m := range arr {
 		s.Outputs = append(s.Outputs, m.Name)
+	}
+}
+
+func (s *State) GetSnapshot() StateView {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return StateView{
+		Outputs:            append([]string(nil), s.Outputs...),
+		CurrentWindowId:    s.CurrentWindowId,
+		CurrentWorkspaceId: s.CurrentWorkspaceId,
+		OverviewOpen:       s.OverviewOpen,
+
+		Windows:             utils.CloneMap(s.Windows),
+		Workspaces:          utils.CloneMap(s.Workspaces),
+		OriginWorkspaceInfo: utils.CloneMap(s.OriginWorkspaceInfo),
+		OriginWindowInfo:    utils.CloneMap(s.OriginWindowInfo),
 	}
 }

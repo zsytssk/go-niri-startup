@@ -8,7 +8,8 @@ import (
 
 func FocusNextWindow() {
 	instance := state.GetStateInstance()
-	currentWorkspaceId := instance.CurrentWorkspaceId
+	view := instance.GetSnapshot()
+	currentWorkspaceId := view.CurrentWorkspaceId
 	getWindows := state.UseWorkspaceWindows(instance)
 
 	windows := getWindows(currentWorkspaceId)

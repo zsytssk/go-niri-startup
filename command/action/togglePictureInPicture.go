@@ -15,9 +15,10 @@ var matchFn = func(w *state.Window) bool {
 
 func togglePictureInPicture() {
 	instance := state.GetStateInstance()
+	view := instance.GetSnapshot()
 	windowFilter := state.UseWindowFilter(instance)
 	wins := windowFilter(matchFn)
-	currentWorkspaceId := instance.CurrentWorkspaceId
+	currentWorkspaceId := view.CurrentWorkspaceId
 
 	if len(wins) == 0 {
 		return
