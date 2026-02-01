@@ -181,7 +181,6 @@ func UseWorkspaceChangeComplete(state *State) func([]ChangeWorkspaceInfo) chan s
 
 			close(done)
 		})
-		defer offFn()
 
 		go func() {
 			select {
