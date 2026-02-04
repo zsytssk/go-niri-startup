@@ -18,26 +18,29 @@ func GetSocketInstance() *Client {
 	return &socketInstance
 }
 
-func NiriSendAction(obj Action) {
+func NiriSendAction(obj Action) ([]byte, error) {
 	client := GetSocketInstance()
 	var msg = map[string]Action{"Action": obj}
-	client.Send(msg)
+	return client.Send(msg)
 }
 
-func NiriSendActionArr(arr []Action) {
+func NiriSendActionArr(arr []Action) error {
 	client := GetSocketInstance()
 	for _, obj := range arr {
 		if obj.Sleep != 0 {
 			time.Sleep(time.Duration(obj.Sleep) * time.Millisecond)
 		} else {
 			var msg = map[string]Action{"Action": obj}
-			client.Send(msg)
+			_, err := client.Send(msg)
+			if err != nil {
+				return err
+			}
 		}
 	}
+	return nil
 }
 
-func NiriSendOutputAction(obj OutputAction) {
+func NiriSend(obj interface{}) ([]byte, error) {
 	client := GetSocketInstance()
-	var msg = map[string]OutputAction{"OutputAction": obj}
-	client.Send(msg)
+	return client.Send(obj)
 }

@@ -4,9 +4,12 @@ type OutputActionPositionSpecific struct {
 	X int `json:"x"`
 	Y int `json:"y"`
 }
-type OutputActionPosition struct {
+type OutputActionPositionDetail struct {
 	Automatic *Empty                        `json:"Automatic,omitempty"`
 	Specific  *OutputActionPositionSpecific `json:"Specific,omitempty"`
+}
+type OutputActionPosition struct {
+	Position *OutputActionPositionDetail `json:"position,omitempty"`
 }
 
 type OutputActionCon struct {
