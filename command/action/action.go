@@ -3,6 +3,7 @@ package action
 import (
 	"encoding/json"
 	"net/http"
+	"niri-startup/action"
 	"niri-startup/utils"
 )
 
@@ -44,8 +45,8 @@ func Action(w http.ResponseWriter, r *http.Request) {
 		utils.RunCMD("niri msg action screenshot", false)
 		Screenshot()
 	case "screenshot-window":
-		utils.NiriSendAction(utils.Action{
-			ScreenshotWindow: &utils.ScreenshotScreen{WriteToDisk: true},
+		utils.NiriSendAction(action.Action{
+			ScreenshotWindow: &action.ScreenshotScreen{WriteToDisk: true},
 		})
 		Screenshot()
 	case "toggle-input":

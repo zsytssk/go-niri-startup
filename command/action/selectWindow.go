@@ -2,6 +2,7 @@ package action
 
 import (
 	"fmt"
+	"niri-startup/action"
 	"niri-startup/state"
 	"niri-startup/utils"
 	"slices"
@@ -80,12 +81,12 @@ func SelectWindow() error {
 	window := wins[index]
 
 	// window 就是你要的
-	utils.NiriSendActionArr([]utils.Action{
+	utils.NiriSendActionArr([]action.Action{
 		{
-			FocusWindow: &utils.WindowWithId{Id: window.ID},
+			FocusWindow: &action.WindowWithId{Id: window.ID},
 		},
 		{
-			CenterWindow: &utils.WindowWithId{Id: window.ID},
+			CenterWindow: &action.WindowWithId{Id: window.ID},
 		},
 	})
 	return nil

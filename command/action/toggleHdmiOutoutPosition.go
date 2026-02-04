@@ -1,6 +1,7 @@
 package action
 
 import (
+	"niri-startup/action"
 	"niri-startup/utils"
 )
 
@@ -12,19 +13,19 @@ func toggleHdmiOutoutPosition() {
 		return
 	}
 
-	posX, err := utils.GetNestedValue(string(outputsStr), "Ok.Outputs.HDMI-A-1.logical.x")
+	posX, err := utils.GetNestedValueFromStr(string(outputsStr), "Ok.Outputs.HDMI-A-1.logical.x")
 	if err != nil {
 		return
 	}
 	if posX.(float64) > 0 {
 		utils.NiriSend(
 			map[string]interface{}{
-				"Output": utils.OutputAction{
+				"Output": action.OutputAction{
 					Output: "HDMI-A-1",
-					Action: &utils.OutputActionCon{
-						Position: &utils.OutputActionPosition{
-							Position: &utils.OutputActionPositionDetail{
-								Specific: &utils.OutputActionPositionSpecific{X: 0, Y: 0},
+					Action: &action.OutputActionCon{
+						Position: &action.OutputActionPosition{
+							Position: &action.OutputActionPositionDetail{
+								Specific: &action.OutputActionPositionSpecific{X: 0, Y: 0},
 							},
 						}},
 				},
@@ -33,12 +34,12 @@ func toggleHdmiOutoutPosition() {
 	} else {
 		utils.NiriSend(
 			map[string]interface{}{
-				"Output": utils.OutputAction{
+				"Output": action.OutputAction{
 					Output: "HDMI-A-1",
-					Action: &utils.OutputActionCon{
-						Position: &utils.OutputActionPosition{
-							Position: &utils.OutputActionPositionDetail{
-								Specific: &utils.OutputActionPositionSpecific{X: 1920, Y: 0},
+					Action: &action.OutputActionCon{
+						Position: &action.OutputActionPosition{
+							Position: &action.OutputActionPositionDetail{
+								Specific: &action.OutputActionPositionSpecific{X: 1920, Y: 0},
 							},
 						}},
 				},

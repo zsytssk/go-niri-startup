@@ -3,6 +3,7 @@ package command
 import (
 	"encoding/json"
 	"net/http"
+	"niri-startup/action"
 	"niri-startup/state"
 	"niri-startup/utils"
 	"slices"
@@ -64,8 +65,8 @@ func RunApp(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	utils.NiriSendAction(utils.Action{
-		FocusWindow: &utils.WindowWithId{
+	utils.NiriSendAction(action.Action{
+		FocusWindow: &action.WindowWithId{
 			Id: window.ID,
 		},
 	})

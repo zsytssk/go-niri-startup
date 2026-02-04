@@ -1,4 +1,4 @@
-package utils
+package action
 
 type Empty struct{}
 type WindowWithId struct {

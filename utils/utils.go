@@ -99,12 +99,15 @@ func GetCurDirFilePath(fileName string) (filePath string, err error) {
 	return
 }
 
-func GetNestedValue(rawStr string, path string) (interface{}, error) {
+func GetNestedValueFromStr(rawStr string, path string) (interface{}, error) {
 	var data map[string]any
 	err := json.Unmarshal([]byte(rawStr), &data)
 	if err != nil {
 		return nil, err
 	}
+	return GetNestedValueFromData(data, path)
+}
+func GetNestedValueFromData(data map[string]any, path string) (interface{}, error) {
 	parts := strings.Split(path, ".")
 	current := data
 

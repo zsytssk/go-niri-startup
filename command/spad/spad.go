@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"niri-startup/action"
 	"niri-startup/config"
 	"niri-startup/state"
 	"niri-startup/utils"
@@ -46,16 +47,16 @@ func Spad(w http.ResponseWriter, r *http.Request) {
 			delete(BindFnMap, win.ID)
 		}
 		if isSpadWinAction(win) {
-			utils.NiriSendActionArr([]utils.Action{
+			utils.NiriSendActionArr([]action.Action{
 				{
-					MoveWindowToWorkspace: &utils.MoveWindowToWorkspace{
+					MoveWindowToWorkspace: &action.MoveWindowToWorkspace{
 						WindowId:  win.ID,
 						Focus:     false,
-						Reference: utils.WindowReference{Name: config.SpadWorkspaceName},
+						Reference: action.WindowReference{Name: config.SpadWorkspaceName},
 					},
 				},
 				{
-					ToggleWindowFloating: &utils.WindowWithId{
+					ToggleWindowFloating: &action.WindowWithId{
 						Id: win.ID,
 					},
 				},
@@ -77,49 +78,49 @@ func Spad(w http.ResponseWriter, r *http.Request) {
 		updateSpadOriInfo(win.ID)
 	}
 
-	utils.NiriSendActionArr([]utils.Action{
+	utils.NiriSendActionArr([]action.Action{
 		{
-			MoveWindowToWorkspace: &utils.MoveWindowToWorkspace{
+			MoveWindowToWorkspace: &action.MoveWindowToWorkspace{
 				WindowId:  win.ID,
 				Focus:     false,
-				Reference: utils.WindowReference{Id: currentWorkspaceId},
+				Reference: action.WindowReference{Id: currentWorkspaceId},
 			},
 		},
 		{
-			SetWindowHeight: &utils.SetWindowSize{
-				Id: win.ID, Change: utils.SetWindowSizeChange{SetFixed: spadConf.Height},
+			SetWindowHeight: &action.SetWindowSize{
+				Id: win.ID, Change: action.SetWindowSizeChange{SetFixed: spadConf.Height},
 			},
 		},
 		{
-			SetWindowWidth: &utils.SetWindowSize{
-				Id: win.ID, Change: utils.SetWindowSizeChange{SetFixed: spadConf.Width},
+			SetWindowWidth: &action.SetWindowSize{
+				Id: win.ID, Change: action.SetWindowSizeChange{SetFixed: spadConf.Width},
 			},
 		},
 		{
-			MoveWindowToFloating: &utils.WindowWithId{Id: win.ID},
+			MoveWindowToFloating: &action.WindowWithId{Id: win.ID},
 		},
 		{
-			FocusWindow: &utils.WindowWithId{Id: win.ID},
+			FocusWindow: &action.WindowWithId{Id: win.ID},
 		},
 		{Sleep: 80},
 		{
-			CenterWindow: &utils.WindowWithId{Id: win.ID},
+			CenterWindow: &action.WindowWithId{Id: win.ID},
 		},
 	})
 	win.WorkspaceID = currentWorkspaceId
 
 	BindFnMap[win.ID] = onWindowBlur(win, func() {
 		delete(BindFnMap, win.ID)
-		utils.NiriSendActionArr([]utils.Action{
+		utils.NiriSendActionArr([]action.Action{
 			{
-				MoveWindowToWorkspace: &utils.MoveWindowToWorkspace{
+				MoveWindowToWorkspace: &action.MoveWindowToWorkspace{
 					WindowId:  win.ID,
 					Focus:     false,
-					Reference: utils.WindowReference{Name: config.SpadWorkspaceName},
+					Reference: action.WindowReference{Name: config.SpadWorkspaceName},
 				},
 			},
 			{
-				ToggleWindowFloating: &utils.WindowWithId{
+				ToggleWindowFloating: &action.WindowWithId{
 					Id: win.ID,
 				},
 			},

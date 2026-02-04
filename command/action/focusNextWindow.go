@@ -1,6 +1,7 @@
 package action
 
 import (
+	"niri-startup/action"
 	"niri-startup/state"
 	"niri-startup/utils"
 	"slices"
@@ -25,7 +26,7 @@ func FocusNextWindow() {
 	}
 	nextWindow := windows[nextIndex]
 
-	utils.NiriSendAction(utils.Action{
-		FocusWindow: &utils.WindowWithId{Id: nextWindow.ID},
+	utils.NiriSendAction(action.Action{
+		FocusWindow: &action.WindowWithId{Id: nextWindow.ID},
 	})
 }

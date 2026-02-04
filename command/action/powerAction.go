@@ -2,6 +2,7 @@ package action
 
 import (
 	"fmt"
+	"niri-startup/action"
 	"niri-startup/state"
 	"niri-startup/utils"
 	"time"
@@ -24,8 +25,8 @@ func PowerAction() error {
 	if result == "󰌾 Lock" {
 		utils.RunCMD("swaylock --daemonize", true)
 		time.Sleep(1 * time.Second)
-		utils.NiriSendAction(utils.Action{
-			PowerOffMonitors: &utils.Empty{},
+		utils.NiriSendAction(action.Action{
+			PowerOffMonitors: &action.Empty{},
 		})
 		return nil
 	}
@@ -60,31 +61,31 @@ func PowerAction() error {
 			return err
 		}
 		currentWorkspaceId := view.CurrentWorkspaceId
-		utils.NiriSendActionArr([]utils.Action{
+		utils.NiriSendActionArr([]action.Action{
 			{
-				MoveWindowToWorkspace: &utils.MoveWindowToWorkspace{
+				MoveWindowToWorkspace: &action.MoveWindowToWorkspace{
 					WindowId:  item.ID,
 					Focus:     true,
-					Reference: utils.WindowReference{Id: currentWorkspaceId},
+					Reference: action.WindowReference{Id: currentWorkspaceId},
 				},
 			},
 			{
-				SetWindowHeight: &utils.SetWindowSize{Id: item.ID,
-					Change: utils.SetWindowSizeChange{SetFixed: 900},
+				SetWindowHeight: &action.SetWindowSize{Id: item.ID,
+					Change: action.SetWindowSizeChange{SetFixed: 900},
 				},
 			},
 			{
-				SetWindowWidth: &utils.SetWindowSize{Id: item.ID,
-					Change: utils.SetWindowSizeChange{SetFixed: 900},
+				SetWindowWidth: &action.SetWindowSize{Id: item.ID,
+					Change: action.SetWindowSizeChange{SetFixed: 900},
 				},
 			},
 			{
-				MoveWindowToFloating: &utils.WindowWithId{Id: item.ID},
+				MoveWindowToFloating: &action.WindowWithId{Id: item.ID},
 			},
 			{Sleep: 80},
-			{FocusWindow: &utils.WindowWithId{Id: item.ID}},
+			{FocusWindow: &action.WindowWithId{Id: item.ID}},
 			{
-				CenterWindow: &utils.WindowWithId{Id: item.ID},
+				CenterWindow: &action.WindowWithId{Id: item.ID},
 			},
 		})
 	}

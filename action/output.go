@@ -1,4 +1,4 @@
-package utils
+package action
 
 type OutputActionPositionSpecific struct {
 	X int `json:"x"`

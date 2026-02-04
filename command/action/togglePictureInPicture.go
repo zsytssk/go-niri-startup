@@ -1,6 +1,7 @@
 package action
 
 import (
+	"niri-startup/action"
 	"niri-startup/config"
 	"niri-startup/state"
 	"niri-startup/utils"
@@ -25,22 +26,22 @@ func togglePictureInPicture() {
 	}
 	win := wins[0]
 	if win.WorkspaceID == currentWorkspaceId {
-		utils.NiriSendActionArr([]utils.Action{
+		utils.NiriSendActionArr([]action.Action{
 			{
-				MoveWindowToWorkspace: &utils.MoveWindowToWorkspace{
+				MoveWindowToWorkspace: &action.MoveWindowToWorkspace{
 					WindowId:  win.ID,
 					Focus:     false,
-					Reference: utils.WindowReference{Name: config.SpadWorkspaceName},
+					Reference: action.WindowReference{Name: config.SpadWorkspaceName},
 				},
 			},
 		})
 	} else {
-		utils.NiriSendActionArr([]utils.Action{
+		utils.NiriSendActionArr([]action.Action{
 			{
-				MoveWindowToWorkspace: &utils.MoveWindowToWorkspace{
+				MoveWindowToWorkspace: &action.MoveWindowToWorkspace{
 					WindowId:  win.ID,
 					Focus:     false,
-					Reference: utils.WindowReference{Id: currentWorkspaceId},
+					Reference: action.WindowReference{Id: currentWorkspaceId},
 				},
 			},
 			// {

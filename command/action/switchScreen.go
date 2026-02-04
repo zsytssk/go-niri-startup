@@ -1,6 +1,7 @@
 package action
 
 import (
+	"niri-startup/action"
 	"niri-startup/state"
 	"niri-startup/utils"
 	"slices"
@@ -53,8 +54,8 @@ func SwitchScreen(changeSpace int) {
 		return a.Idx - b.Idx
 	})
 
-	moveActions := []utils.Action{}
-	focusActions := []utils.Action{}
+	moveActions := []action.Action{}
+	focusActions := []action.Action{}
 	changeList := make([]state.ChangeWorkspaceInfo, 0)
 	for _, workspace := range append(nextOutputWorkspaces, curOutputWorkspaces...) {
 		var goOutput string
@@ -69,36 +70,36 @@ func SwitchScreen(changeSpace int) {
 			Idx:      workspace.Idx,
 			IsActive: workspace.IsActive,
 		})
-		actions := []utils.Action{
+		actions := []action.Action{
 			{
-				MoveWorkspaceToMonitor: &utils.MoveWorkspaceToMonitor{
+				MoveWorkspaceToMonitor: &action.MoveWorkspaceToMonitor{
 					Output: goOutput,
-					Reference: utils.WindowReference{
+					Reference: action.WindowReference{
 						Id: workspace.ID,
 					},
 				},
 			},
 			{
-				MoveWorkspaceToIndex: &utils.MoveWorkspaceToIndex{
+				MoveWorkspaceToIndex: &action.MoveWorkspaceToIndex{
 					Index: workspace.Idx,
-					Reference: utils.WindowReference{
+					Reference: action.WindowReference{
 						Id: workspace.ID,
 					},
 				},
 			},
 		}
 		if workspace.IsFocused {
-			focusActions = append(focusActions, utils.Action{
-				FocusWorkspace: &utils.FocusWorkspace{
-					Reference: utils.WindowReference{
+			focusActions = append(focusActions, action.Action{
+				FocusWorkspace: &action.FocusWorkspace{
+					Reference: action.WindowReference{
 						Id: workspace.ID,
 					},
 				}},
 			)
 		} else if workspace.IsActive {
-			actions = append([]utils.Action{
-				{FocusWorkspace: &utils.FocusWorkspace{
-					Reference: utils.WindowReference{
+			actions = append([]action.Action{
+				{FocusWorkspace: &action.FocusWorkspace{
+					Reference: action.WindowReference{
 						Id: workspace.ID,
 					},
 				}},

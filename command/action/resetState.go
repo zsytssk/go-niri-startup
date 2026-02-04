@@ -1,6 +1,7 @@
 package action
 
 import (
+	"niri-startup/action"
 	"niri-startup/state"
 	"niri-startup/utils"
 )
@@ -30,11 +31,12 @@ func ResetState() {
 			continue
 		}
 		if win.WorkspaceID != oriInfo.Workspace {
-			utils.NiriSendAction(utils.Action{MoveWindowToWorkspace: &utils.MoveWindowToWorkspace{
-				WindowId:  win.ID,
-				Focus:     false,
-				Reference: utils.WindowReference{Id: oriInfo.Workspace},
-			}})
+			utils.NiriSendAction(action.Action{
+				MoveWindowToWorkspace: &action.MoveWindowToWorkspace{
+					WindowId:  win.ID,
+					Focus:     false,
+					Reference: action.WindowReference{Id: oriInfo.Workspace},
+				}})
 		}
 	}
 	for _, workspace := range Workspaces {
@@ -44,19 +46,19 @@ func ResetState() {
 			continue
 		}
 		if workspace.Output != oriInfo.Outout {
-			utils.NiriSendActionArr([]utils.Action{
+			utils.NiriSendActionArr([]action.Action{
 				{
-					MoveWorkspaceToMonitor: &utils.MoveWorkspaceToMonitor{
+					MoveWorkspaceToMonitor: &action.MoveWorkspaceToMonitor{
 						Output: oriInfo.Outout,
-						Reference: utils.WindowReference{
+						Reference: action.WindowReference{
 							Id: workspace.ID,
 						},
 					},
 				},
 				{
-					MoveWorkspaceToIndex: &utils.MoveWorkspaceToIndex{
+					MoveWorkspaceToIndex: &action.MoveWorkspaceToIndex{
 						Index: oriInfo.Idx,
-						Reference: utils.WindowReference{
+						Reference: action.WindowReference{
 							Id: workspace.ID,
 						},
 					},
@@ -66,15 +68,15 @@ func ResetState() {
 	}
 
 	for _, workspace := range activeWorkspaces {
-		utils.NiriSendAction(utils.Action{
-			FocusWorkspace: &utils.FocusWorkspace{
-				Reference: utils.WindowReference{Id: workspace.ID},
+		utils.NiriSendAction(action.Action{
+			FocusWorkspace: &action.FocusWorkspace{
+				Reference: action.WindowReference{Id: workspace.ID},
 			}},
 		)
 	}
 
-	utils.NiriSendAction(utils.Action{
-		FocusWindow: &utils.WindowWithId{
+	utils.NiriSendAction(action.Action{
+		FocusWindow: &action.WindowWithId{
 			Id: CurrentWindowId,
 		}},
 	)
