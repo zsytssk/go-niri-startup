@@ -98,3 +98,34 @@ func GetCurDirFilePath(fileName string) (filePath string, err error) {
 	filePath = path.Join(exPath, fileName)
 	return
 }
+
+func GetNestedValue(rawStr string, path string) (interface{}, error) {
+	var data map[string]any
+	err := json.Unmarshal([]byte(rawStr), &data)
+	if err != nil {
+		return nil, err
+	}
+	parts := strings.Split(path, ".")
+	current := data
+
+	for i, key := range parts {
+		val, ok := current[key]
+		if !ok {
+			return nil, fmt.Errorf("key %q not found at level %d", key, i)
+		}
+
+		// 到最后一层就返回值
+		if i == len(parts)-1 {
+			return val, nil
+		}
+
+		// 向下一层 map
+		nextMap, ok := val.(map[string]any)
+		if !ok {
+			return nil, fmt.Errorf("key %q at level %d is not a map (got %T)", key, i, val)
+		}
+		current = nextMap
+	}
+
+	return nil, fmt.Errorf("unexpected error in GetNestedValue")
+}

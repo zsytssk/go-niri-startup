@@ -1,3 +1,7 @@
+## 2026-02-04 10:29:10
+
+utils.Action -> action.Action ?
+
 ## 2026-01-17 21:18:10
 
 - @ques socket 出现多次重联 而且没有失败的 log
@@ -16,12 +20,10 @@ once.Do(func() {
 ## 2025-12-12 09:18:44
 
 - 感觉没有什么好办法可以解决这个问题
-
   - http 三次握手？
   - go 模拟单线程模型？
 
 - @bug spad 功能，连续打开两个 chrome spad 会切换到 chrome 所在 workspace
-
   - CurrentWorkspaceId 计算错误
   - addWindow
 
@@ -30,11 +32,9 @@ once.Do(func() {
 - @ques id 除了自增还有什么办法
 
 - @ques `niri-client` 跨线程可能会出的问题
-
   - 用一个消息处理进出所有消息。。。
 
 - 缺少 MoveWindowToIndex
-
   - 将 spad 移动到 workspace 最后位置
 
 - 跨线程数据安全 -> event
@@ -60,9 +60,7 @@ OffEvent // 即使同时多次调用会出什么问题？
 - @bug 内存提升
 
 - @ques Map / Slice 的元素一律存 指针
-
   - Msg + Action -> 剔除 地址
-
     - Action 是可选参数，用地址更合适
     - Msg 同理
 
@@ -167,11 +165,9 @@ for _, w := range state.Windows { // w是循环临时变量，地址固定
 
 - @ques runApp 的顺序问题
 - @ques 优化 switchScreen 脚本
-
   - 其他窗口的动画
 
 - @ques 发送命令放到一个线程中
-
   - 怎么处理断线的逻辑？
 
 - @ques 能不能等待某个值变为 true 后执行某个代码
@@ -190,7 +186,6 @@ WindowFocusTimestampChanged {"WindowFocusTimestampChanged":{"id":34,"focus_times
 ## 2025-12-04 08:49:42
 
 - @todo
-
   - ***
 
   - 其他功能
@@ -207,7 +202,6 @@ WindowFocusTimestampChanged {"WindowFocusTimestampChanged":{"id":34,"focus_times
   - 读取配置
 
 - @ques client.send 能不能使用队列 一个个的发送命令
-
   - curOutput | nextOutput -> 可能是 CurrentWorkspaceId 不对
   - 可能是 从 socket 返回的数据出了问题 ->
     - 同时写入太多数据导致卡死了， 而且数据是 byte 格式，解析出问题了
@@ -260,13 +254,11 @@ func UseWaitWindowOpen(state *State) func(func(*Window) bool) (*Window, error) {
 - @ques `client.Connected` 有多个消息该如何处理
 
 - @ques 在协程中更新数据，主进程读取会不会出问题
-
   - 按照道理来说应该不会
 
 - 一旦出现协程，问题复杂度就提高几个量级
 
 - @ques 如何连接 socket
-
   - 检查断线重联是否有效
   - ***
   - 连接
@@ -389,7 +381,6 @@ func RunApp(w http.ResponseWriter, r *http.Request) {
 ```
 
 - @bug
-
   - CurrentWorkspaceId 不对
 
 - @ques 写入卡死，能正常读取
