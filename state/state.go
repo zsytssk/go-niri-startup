@@ -248,17 +248,19 @@ func (s *State) outputsChange(workspaces []Workspace) {
 		}
 	}
 
-	outputsStr, err := utils.RunCMD("niri msg --json outputs", false)
+	outputsStr, err := utils.NiriSend(map[string]interface{}{
+		"Outputs": nil,
+	})
 	if err != nil {
 		return
 	}
-	var monitors map[string]Monitor
+	var monitors map[string]map[string]map[string]Monitor
 	if err := json.Unmarshal([]byte(outputsStr), &monitors); err != nil {
 		panic(err)
 	}
-
-	var arr = make([]Monitor, 0, len(monitors))
-	for _, m := range monitors {
+	outputs := monitors["Ok"]["Outputs"]
+	var arr = make([]Monitor, 0, len(outputs))
+	for _, m := range outputs {
 		arr = append(arr, m)
 	}
 	slices.SortFunc(arr, func(a, b Monitor) int {

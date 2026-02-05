@@ -1,3 +1,8 @@
+## 2026-02-05 09:55:49
+
+https://yalter.github.io/niri/niri_ipc/enum.Action.html
+https://yalter.github.io/niri/niri_ipc/enum.OutputAction.html
+
 ## 2026-02-04 10:29:10
 
 utils.Action -> action.Action ?
