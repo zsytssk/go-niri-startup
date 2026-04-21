@@ -99,9 +99,9 @@ func GetCurDirFilePath(fileName string) (filePath string, err error) {
 	return
 }
 
-func GetNestedValueFromStr(rawStr string, path string) (interface{}, error) {
+func GetNestedValueFromStr(rawStr []byte, path string) (interface{}, error) {
 	var data map[string]any
-	err := json.Unmarshal([]byte(rawStr), &data)
+	err := json.Unmarshal(rawStr, &data)
 	if err != nil {
 		return nil, err
 	}

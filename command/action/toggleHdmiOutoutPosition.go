@@ -13,7 +13,7 @@ func toggleHdmiOutoutPosition() {
 		return
 	}
 
-	posX, err := utils.GetNestedValueFromStr(string(outputsStr), "Ok.Outputs.HDMI-A-1.logical.x")
+	posX, err := utils.GetNestedValueFromStr(outputsStr, "Ok.Outputs.HDMI-A-1.logical.x")
 	if err != nil {
 		return
 	}

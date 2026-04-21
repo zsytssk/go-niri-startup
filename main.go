@@ -9,6 +9,7 @@ import (
 	"niri-startup/command/action"
 	"niri-startup/command/spad"
 	"niri-startup/config"
+	"niri-startup/initScript"
 	"niri-startup/state"
 	"niri-startup/utils"
 	"os"
@@ -50,6 +51,8 @@ func main() {
 	http.HandleFunc("/action", action.Action)
 	http.HandleFunc("/runApp", command.RunApp)
 	http.HandleFunc("/getState", command.GetState)
+	initScript.Run()
+
 	err = http.ListenAndServe(fmt.Sprintf(":%d", PORT), nil)
 	utils.RunCMD("notify-send 退出 niri-ts-startup!", false)
 	if err != nil {
