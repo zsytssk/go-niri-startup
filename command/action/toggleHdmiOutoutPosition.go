@@ -5,7 +5,7 @@ import (
 	"niri-startup/utils"
 )
 
-func toggleHdmiOutoutPosition() {
+func ToggleHdmiOutoutPosition() {
 	outputsStr, err := utils.NiriSend(map[string]interface{}{
 		"Outputs": nil,
 	})

@@ -62,7 +62,7 @@ func Action(w http.ResponseWriter, r *http.Request) {
 	case "reset-state":
 		ResetState()
 	case "toggle-hdmi-outout-position":
-		toggleHdmiOutoutPosition()
+		ToggleHdmiOutoutPosition()
 	case "test-action":
 		testAction()
 	}

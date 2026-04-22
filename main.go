@@ -33,17 +33,12 @@ func main() {
 		http.Post(fmt.Sprintf("http://127.0.0.1:%d/%s", PORT, name), "application/json", bytes.NewBuffer([]byte(data)))
 		return
 	}
-	// 处理本地服务器
-	if !utils.IsPortAvailable(PORT) {
-		panic(fmt.Sprintf("端口 %d 已被占用", PORT))
-	}
+
 	_, err := config.GetConfig()
 	if err != nil {
 		panic(err)
 	}
 
-	os.Stdout.WriteString("\n")
-	log.Println("启动niri-startup")
 	state.GetStateInstance()
 	utils.GetSocketInstance()
 	utils.RunCMD("notify-send 启动 niri-ts-startup!", false)
@@ -51,7 +46,11 @@ func main() {
 	http.HandleFunc("/action", action.Action)
 	http.HandleFunc("/runApp", command.RunApp)
 	http.HandleFunc("/getState", command.GetState)
-	initScript.Run()
+	if err := initScript.Check(PORT); err != nil {
+		panic(err)
+	}
+	os.Stdout.WriteString("\n")
+	log.Println("启动niri-startup")
 
 	err = http.ListenAndServe(fmt.Sprintf(":%d", PORT), nil)
 	utils.RunCMD("notify-send 退出 niri-ts-startup!", false)
