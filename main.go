@@ -46,7 +46,7 @@ func main() {
 	http.HandleFunc("/action", action.Action)
 	http.HandleFunc("/runApp", command.RunApp)
 	http.HandleFunc("/getState", command.GetState)
-	if err := initScript.Check(PORT); err != nil {
+	if stop, err := initScript.Check(PORT); stop && err != nil {
 		panic(err)
 	}
 	os.Stdout.WriteString("\n")
