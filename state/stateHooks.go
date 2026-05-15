@@ -39,6 +39,27 @@ func UseWaitWindowOpen(state *State) func(func(*Window) bool) (*Window, error) {
 	}
 }
 
+func UseWaitWindowClose(state *State) func(*Window) error {
+	return func(win *Window) error {
+		ch := make(chan struct{}, 1)
+		off := state.OnEvent("WindowClosed", func(msg interface{}) {
+			wid := &msg.(EventStreamMsg).WindowClosed.Id
+			if *wid == win.ID {
+				ch <- struct{}{}
+			}
+		})
+		defer off()
+
+		select {
+		case _ = <-ch:
+			return nil
+		case <-time.After(60 * 5 * time.Second):
+			// 超时也取消事件监听
+			return fmt.Errorf("timeout waiting for window")
+		}
+	}
+}
+
 func UseWindowFilter(state *State) func(func(*Window) bool) []*Window {
 	return func(filterFn func(*Window) bool) []*Window {
 		state.mu.RLock()

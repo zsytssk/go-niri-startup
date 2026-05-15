@@ -5,6 +5,7 @@ import (
 	"niri-startup/action"
 	"niri-startup/state"
 	"niri-startup/utils"
+	"os/exec"
 	"time"
 )
 
@@ -17,8 +18,109 @@ func runConfirm(tip string) bool {
 	return true
 }
 
+func runGhosttyCmd(title string, script string) error {
+	// cmd = fmt.Sprintf(`ghostty --title="%s" --class="runCmd.ghostty" -e sh -c "%s"`, title, cmd)
+	cmd := exec.Command(
+		"ghostty",
+		"--title="+title,
+		"--class=runCmd.ghostty",
+		"-e",
+		"sh",
+		"-c",
+		script,
+	)
+
+	err := cmd.Start()
+	if err != nil {
+		panic(err)
+	}
+	instance := state.GetStateInstance()
+	waitWindowOpen := state.UseWaitWindowOpen(instance)
+	waitWindowClose := state.UseWaitWindowClose(instance)
+	view := instance.GetSnapshot()
+	item, err := waitWindowOpen(func(w *state.Window) bool {
+		return w.AppId == "runCmd.ghostty"
+	})
+	if err != nil {
+		return err
+	}
+	currentWorkspaceId := view.CurrentWorkspaceId
+	utils.NiriSendActionArr([]action.Action{
+		{
+			MoveWindowToWorkspace: &action.MoveWindowToWorkspace{
+				WindowId:  item.ID,
+				Focus:     true,
+				Reference: action.WindowReference{Id: currentWorkspaceId},
+			},
+		},
+		{
+			SetWindowHeight: &action.SetWindowSize{Id: item.ID,
+				Change: action.SetWindowSizeChange{SetFixed: 900},
+			},
+		},
+		{
+			SetWindowWidth: &action.SetWindowSize{Id: item.ID,
+				Change: action.SetWindowSizeChange{SetFixed: 900},
+			},
+		},
+		{
+			MoveWindowToFloating: &action.WindowWithId{Id: item.ID},
+		},
+		{Sleep: 80},
+		{FocusWindow: &action.WindowWithId{Id: item.ID}},
+		{
+			CenterWindow: &action.WindowWithId{Id: item.ID},
+		},
+	})
+	err = waitWindowClose(item)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func runPowerOption(name string, cmd string) error {
+	script := fmt.Sprintf(`
+		clear
+
+		echo "===== 系统清理 ====="
+
+		echo "[1/2] 关闭 Wine..."
+		/usr/bin/wineserver -k
+		echo "[✓] Wine 已关闭"
+
+		echo
+		echo "[2/2] 关闭 postgres..."
+		sudo pkill -9 postgres 2>/dev/null || true
+		echo "[✓] postgres 已处理"
+
+		echo
+		echo "是否%s? (Y/N)"
+		read -p "> " choice
+
+		case "$choice" in
+			Y|y)
+				echo "正在%s..."
+				%s
+				;;
+			*)
+				echo "已取消%s"
+				;;
+		esac
+
+		exec bash
+	`, name, name, cmd, name)
+
+	err := runGhosttyCmd("Update System", script)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func PowerAction() error {
-	result, err := utils.RunCMD(`printf "󰌾 Lock\n󰍃 Logout\n󰙧 Shutdown\n󰑐 Reboot\n󰚰 Update" | fuzzel -d -p "请选择: "`, false)
+
+	result, err := utils.RunCMD(`printf "󰌾 Lock\n󰍃 Logout\n󰙧 Shutdown\n󰑐 Reboot\n󰚰 Update\n☕ Test" | fuzzel -d -p "请选择: "`, false)
 	if err != nil {
 		return err
 	}
@@ -31,63 +133,40 @@ func PowerAction() error {
 		return nil
 	}
 	if result == "󰍃 Logout" {
-		utils.RunCMD("niri msg action quit --skip-confirmation", false)
+		err = runPowerOption("退出登陆", "niri msg action quit --skip-confirmation")
+		if err != nil {
+			return err
+		}
 		return nil
 	}
 	if result == "󰑐 Reboot" {
-		if runConfirm(`确定要重启吗？`) {
-			utils.RunCMD("reboot", false)
+		err = runPowerOption("重启", "reboot")
+		if err != nil {
+			return err
 		}
 		return nil
 	}
 	if result == "󰙧 Shutdown" {
-		if runConfirm(`确定要关机吗？`) {
-			utils.RunCMD("shutdown -h now", false)
+		err = runPowerOption("关机", "shutdown -h now")
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+	if result == "☕ Test" {
+		// err = runGhosttyCmd("Update System", "/usr/bin/wineserver -k ; sudo pkill -9 postgres; exec bash")
+		// err = runPowerOption("关机", "shutdown -h now")
+		err = runPowerOption("关机", "echo \"假装关机...\"")
+		if err != nil {
+			return err
 		}
 		return nil
 	}
 	if result == "󰚰 Update" {
-		utils.RunCMD(
-			`ghostty --title="Update System" --class="update.ghostty" -e sh -c "neofetch && sudo apt update && sudo apt upgrade; exec bash"`,
-			true,
-		)
-		instance := state.GetStateInstance()
-		waitWindowOpen := state.UseWaitWindowOpen(instance)
-		view := instance.GetSnapshot()
-		item, err := waitWindowOpen(func(w *state.Window) bool {
-			return w.AppId == "update.ghostty"
-		})
+		err = runGhosttyCmd("Update System", "neofetch && sudo apt update && sudo apt upgrade; exec bash")
 		if err != nil {
 			return err
 		}
-		currentWorkspaceId := view.CurrentWorkspaceId
-		utils.NiriSendActionArr([]action.Action{
-			{
-				MoveWindowToWorkspace: &action.MoveWindowToWorkspace{
-					WindowId:  item.ID,
-					Focus:     true,
-					Reference: action.WindowReference{Id: currentWorkspaceId},
-				},
-			},
-			{
-				SetWindowHeight: &action.SetWindowSize{Id: item.ID,
-					Change: action.SetWindowSizeChange{SetFixed: 900},
-				},
-			},
-			{
-				SetWindowWidth: &action.SetWindowSize{Id: item.ID,
-					Change: action.SetWindowSizeChange{SetFixed: 900},
-				},
-			},
-			{
-				MoveWindowToFloating: &action.WindowWithId{Id: item.ID},
-			},
-			{Sleep: 80},
-			{FocusWindow: &action.WindowWithId{Id: item.ID}},
-			{
-				CenterWindow: &action.WindowWithId{Id: item.ID},
-			},
-		})
 	}
 	return nil
 }
