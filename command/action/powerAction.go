@@ -95,8 +95,10 @@ func runPowerOption(name string, cmd string) error {
 		echo "[✓] postgres 已处理"
 
 		echo
-		echo "是否%s? (Y/N)"
+		echo "是否%s? (Y/n)"
 		read -p "> " choice
+
+		choice="${choice:-Y}"
 
 		case "$choice" in
 			Y|y)
