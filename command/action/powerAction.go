@@ -18,12 +18,12 @@ func runConfirm(tip string) bool {
 	return true
 }
 
-func runGhosttyCmd(title string, script string) error {
+func runGhosttyCmd(name string, title string, script string) error {
 	// cmd = fmt.Sprintf(`ghostty --title="%s" --class="runCmd.ghostty" -e sh -c "%s"`, title, cmd)
 	cmd := exec.Command(
 		"ghostty",
 		"--title="+title,
-		"--class=runCmd.ghostty",
+		"--class="+name+".ghostty",
 		"-e",
 		"sh",
 		"-c",
@@ -39,7 +39,7 @@ func runGhosttyCmd(title string, script string) error {
 	waitWindowClose := state.UseWaitWindowClose(instance)
 	view := instance.GetSnapshot()
 	item, err := waitWindowOpen(func(w *state.Window) bool {
-		return w.AppId == "runCmd.ghostty"
+		return w.AppId == name+".ghostty"
 	})
 	if err != nil {
 		return err
@@ -83,16 +83,19 @@ func runPowerOption(name string, cmd string) error {
 	script := fmt.Sprintf(`
 		clear
 
-		echo "===== 系统清理 ====="
+		echo "===== %s ====="
 
-		echo "[1/2] 关闭 Wine..."
-		/usr/bin/wineserver -k
-		echo "[✓] Wine 已关闭"
+		if pgrep -x wineserver >/dev/null 2>&1 || pgrep -x wine >/dev/null 2>&1; then
+			echo "[关闭] Wine..."
+			/usr/bin/wineserver -k
+			echo "[✓] Wine 已关闭"
+		fi
 
-		echo
-		echo "[2/2] 关闭 postgres..."
-		sudo pkill -9 postgres 2>/dev/null || true
-		echo "[✓] postgres 已处理"
+		if pgrep -x postgres >/dev/null 2>&1; then
+			echo "[关闭] Postgres..."
+			sudo pkill -x postgres
+			echo "[✓] Postgres 已关闭"
+		fi
 
 		echo
 		echo "是否%s? (Y/n)"
@@ -109,11 +112,10 @@ func runPowerOption(name string, cmd string) error {
 				echo "已取消%s"
 				;;
 		esac
-
 		exec bash
-	`, name, name, cmd, name)
+	`, name, name, name, cmd, name)
 
-	err := runGhosttyCmd("Update System", script)
+	err := runGhosttyCmd("clean", "Clean System", script)
 	if err != nil {
 		return err
 	}
@@ -165,7 +167,7 @@ func PowerAction() error {
 		return nil
 	}
 	if result == "󰚰 Update" {
-		err = runGhosttyCmd("Update System", "neofetch && sudo apt update && sudo apt upgrade; exec bash")
+		err = runGhosttyCmd("update", "Update System", "neofetch && sudo apt update && sudo apt upgrade; exec bash")
 		if err != nil {
 			return err
 		}
