@@ -85,7 +85,7 @@ func runPowerOption(name string, cmd string) error {
 
 		echo "===== %s ====="
 
-		if pgrep -x wineserver >/dev/null 2>&1 || pgrep -x wine >/dev/null 2>&1; then
+		if pgrep -f "wine|wineserver|\.exe" > /dev/null 2>&1; then
 			echo "[关闭] Wine..."
 			/usr/bin/wineserver -k
 			echo "[✓] Wine 已关闭"

@@ -1,3 +1,5 @@
+能不能像terminal.shop一样 将某些操作(比如关机等) 做成好看的ui形式?
+
 # niri-go-startup
 
 this is a go script for some niri wm functions. eg `scratchpad` `switch screen` and `run app or focus existed app` ..
