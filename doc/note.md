@@ -1,3 +1,13 @@
+## 2026-06-29 14:23:30
+
+```
+bind = $mainMod, R, exec, sh -c 'cmd=$(fuzzel --dmenu --prompt="🔧 " --lines=1) && [ -n "$cmd" ] && notify-send "执行" "$cmd" && bash -c "$cmd"'
+
+niri msg action spawn-sh -- "你要执行的命令"
+
+waybar transws niri-startup niri -> 看看能不能直接重启niri
+```
+
 ## 2026-02-05 09:55:49
 
 https://yalter.github.io/niri/niri_ipc/enum.Action.html

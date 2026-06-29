@@ -28,6 +28,8 @@ func Action(w http.ResponseWriter, r *http.Request) {
 		GetCurWindow(w, req)
 	case "power-actions":
 		err = PowerAction()
+	case "cmd-actions":
+		err = CmdAction()
 	case "next-window":
 		FocusNextWindow()
 	case "select-window":

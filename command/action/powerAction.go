@@ -32,7 +32,7 @@ func runGhosttyCmd(name string, title string, script string) error {
 
 	err := cmd.Start()
 	if err != nil {
-		panic(err)
+		return err
 	}
 	instance := state.GetStateInstance()
 	waitWindowOpen := state.UseWaitWindowOpen(instance)
