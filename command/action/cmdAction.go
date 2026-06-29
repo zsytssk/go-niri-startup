@@ -28,7 +28,7 @@ func runNiriSh(sh string) error {
 
 func CmdAction() error {
 
-	cmd, err := utils.RunCMD(`printf "Waybar\nTransws\nNiri-startup\nNiri\n" | fuzzel -d -p "运行快捷命令: "`, false)
+	cmd, err := utils.RunCMD(`printf "Waybar\nTransws\nNiri-startup\n" | fuzzel -d -p "运行快捷命令: "`, false)
 	if err != nil {
 		return err
 	}
