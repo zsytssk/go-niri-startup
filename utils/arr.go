@@ -1,19 +1,5 @@
 package utils
 
-import (
-	"strings"
-)
-
-func ArrJoin[T any](arr []T, fn func(item T, index int) string) string {
-	var fzfInput strings.Builder
-
-	for index, item := range arr {
-		fzfInput.WriteString(fn(item, index))
-
-	}
-
-	return fzfInput.String()
-}
 
 func CloneMap[K comparable, V any](src map[K]V) map[K]V {
 	if src == nil {
@@ -24,4 +10,15 @@ func CloneMap[K comparable, V any](src map[K]V) map[K]V {
 		dst[k] = v
 	}
 	return dst
+}
+
+
+
+func Contains[T comparable](s []T, target T) bool {
+    for _, item := range s {
+        if item == target {
+            return true
+        }
+    }
+    return false
 }

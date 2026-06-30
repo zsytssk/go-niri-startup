@@ -2,7 +2,7 @@ package initScript
 
 import (
 	"fmt"
-	"niri-startup/command/action"
+	"niri-startup/command/action/cmdAction"
 	"niri-startup/utils"
 )
 
@@ -33,7 +33,7 @@ func Check(PORT int) (stop bool, err error) {
 		return
 	}
 	if HDMIOutputMake == "Huawei Technologies Co., Inc." {
-		action.ToggleHdmiOutoutPosition()
+		cmdAction.ToggleHdmiOutoutPosition("")
 	}
 
 	return

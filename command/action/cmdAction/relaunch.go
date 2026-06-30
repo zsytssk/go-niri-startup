@@ -1,11 +1,19 @@
-package action
+package cmdAction
 
 import (
 	"fmt"
-	"niri-startup/utils"
 	"os/exec"
 	"strings"
 )
+
+var RelaunchAction = CmdActionItem {
+	CmdList: []string {
+		"Waybar Relaunch",
+		"Transws Relaunch",
+		"Niri-startup Relaunch",
+	},
+	Fn: CmdAction,
+}
 
 func runNiriSh(sh string) error {
 	// niri msg action spawn-sh -- "你要执行的命令"
@@ -26,12 +34,8 @@ func runNiriSh(sh string) error {
 	return nil
 }
 
-func CmdAction() error {
-
-	cmd, err := utils.RunCMD(`printf "Waybar Relaunch\nTransws Relaunch\nNiri-startup Relaunch\n" | fuzzel -d -p "运行快捷命令: "`, false)
-	if err != nil {
-		return err
-	}
+func CmdAction(cmd string) error {
+	var err error
 	if cmd == "Niri-startup Relaunch" {
 		err = runNiriSh("pkill niri-startup >/dev/null 2>&1 || true; exec niri-startup >> ~/Documents/zsy/github/go-niri-startup/niri-bun.log 2>&1")
 		if err != nil {

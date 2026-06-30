@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"niri-startup/action"
+	"niri-startup/command/action/cmdAction"
 	"niri-startup/utils"
 )
 
@@ -29,7 +30,7 @@ func Action(w http.ResponseWriter, r *http.Request) {
 	case "power-actions":
 		err = PowerAction()
 	case "cmd-actions":
-		err = CmdAction()
+		err = cmdAction.Run()
 	case "next-window":
 		FocusNextWindow()
 	case "select-window":
@@ -63,8 +64,6 @@ func Action(w http.ResponseWriter, r *http.Request) {
 		togglePictureInPicture()
 	case "reset-state":
 		ResetState()
-	case "toggle-hdmi-outout-position":
-		ToggleHdmiOutoutPosition()
 	case "test-action":
 		testAction()
 	}
