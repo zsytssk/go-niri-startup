@@ -44,10 +44,11 @@ func CmdAction(cmd string) error {
 		return nil
 	}
 
+	cmd = strings.Replace(cmd, "Relaunch", "", 1)
 	cmd = strings.ToLower(cmd)
 	cmd = fmt.Sprintf("(pkill %s 2>/dev/null || true) && %s &", cmd, cmd)
-	fmt.Println(cmd)
 	err = runNiriSh(cmd)
+	fmt.Println(cmd, err)
 	if err != nil {
 		return err
 	}
