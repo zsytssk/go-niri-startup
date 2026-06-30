@@ -1,4 +1,4 @@
-package action
+package cmdAction
 
 import (
 	"fmt"
@@ -6,8 +6,64 @@ import (
 	"niri-startup/state"
 	"niri-startup/utils"
 	"os/exec"
+	"strings"
 	"time"
 )
+
+var SystemAction = CmdActionItem {
+	CmdList: []string {
+		"󰌾 Lock System",
+		"󰍃 Logout System",
+		"󰍃 Logout System",
+		"󰙧 Shutdown System",
+		"󰑐 Reboot System",
+		"󰚰 Update System",
+	},
+	Fn: SystemActionFn,
+}
+
+
+func SystemActionFn(cmd string) error {
+	var err error
+	cmd = strings.Replace(cmd, " System", "", 1)
+	if cmd == "󰌾 Lock" {
+		utils.RunCMD("swaylock --daemonize", true)
+		time.Sleep(1 * time.Second)
+		utils.NiriSendAction(action.Action{
+			PowerOffMonitors: &action.Empty{},
+		})
+		return nil
+	}
+	if cmd == "󰍃 Logout" {
+		err = runPowerOption("退出登陆", "niri msg action quit --skip-confirmation")
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+	if cmd == "󰑐 Reboot" {
+		err = runPowerOption("重启", "reboot")
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+	if cmd == "󰙧 Shutdown" {
+		err = runPowerOption("关机", "shutdown -h now")
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+	if cmd == "󰚰 Update" {
+		err = runGhosttyCmd("update", "Update System", "neofetch && sudo apt update && sudo apt upgrade; exec bash")
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 
 func runConfirm(tip string) bool {
 	cmd := fmt.Sprintf(`if zenity --question --text="%s" --title="问题"; then echo "Y"; else echo "N"; fi`, tip)
@@ -118,59 +174,6 @@ func runPowerOption(name string, cmd string) error {
 	err := runGhosttyCmd("clean", "Clean System", script)
 	if err != nil {
 		return err
-	}
-	return nil
-}
-
-func PowerAction() error {
-
-	result, err := utils.RunCMD(`printf "󰌾 Lock\n󰍃 Logout\n󰙧 Shutdown\n󰑐 Reboot\n󰚰 Update\n☕ Test" | fuzzel -d -p "请选择: "`, false)
-	if err != nil {
-		return err
-	}
-	if result == "󰌾 Lock" {
-		utils.RunCMD("swaylock --daemonize", true)
-		time.Sleep(1 * time.Second)
-		utils.NiriSendAction(action.Action{
-			PowerOffMonitors: &action.Empty{},
-		})
-		return nil
-	}
-	if result == "󰍃 Logout" {
-		err = runPowerOption("退出登陆", "niri msg action quit --skip-confirmation")
-		if err != nil {
-			return err
-		}
-		return nil
-	}
-	if result == "󰑐 Reboot" {
-		err = runPowerOption("重启", "reboot")
-		if err != nil {
-			return err
-		}
-		return nil
-	}
-	if result == "󰙧 Shutdown" {
-		err = runPowerOption("关机", "shutdown -h now")
-		if err != nil {
-			return err
-		}
-		return nil
-	}
-	if result == "☕ Test" {
-		// err = runGhosttyCmd("Update System", "/usr/bin/wineserver -k ; sudo pkill -9 postgres; exec bash")
-		// err = runPowerOption("关机", "shutdown -h now")
-		err = runPowerOption("关机", "echo \"假装关机...\"")
-		if err != nil {
-			return err
-		}
-		return nil
-	}
-	if result == "󰚰 Update" {
-		err = runGhosttyCmd("update", "Update System", "neofetch && sudo apt update && sudo apt upgrade; exec bash")
-		if err != nil {
-			return err
-		}
 	}
 	return nil
 }

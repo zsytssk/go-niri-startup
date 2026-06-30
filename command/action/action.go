@@ -27,10 +27,10 @@ func Action(w http.ResponseWriter, r *http.Request) {
 	switch req.Name {
 	case "get-cur-window":
 		GetCurWindow(w, req)
-	case "power-actions":
-		err = PowerAction()
+	case "system-actions":
+		err = cmdAction.Run("System")
 	case "cmd-actions":
-		err = cmdAction.Run()
+		err = cmdAction.Run("")
 	case "next-window":
 		FocusNextWindow()
 	case "select-window":

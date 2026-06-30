@@ -11,19 +11,24 @@ type CmdActionItem struct {
 	Fn     func(string)error
 }
 
-func Run() error {
+func Run(prefix string) error {
 	actionList := []CmdActionItem {
 		RelaunchAction,
 		HdmiOutoutPositionAction,
+		SystemAction,
 	}
 	cmdList := make([]string, 0)
 	for _,item := range(actionList) {
 		cmdList = append(cmdList, item.CmdList...)
 	}
-
-	cmd := fmt.Sprintf(`printf "%s" | fuzzel -d -p "快捷命令: "`, strings.Join(cmdList, "\n"))
+	var cmd string
+	if len(prefix) > 0 {
+		cmd = fmt.Sprintf(`printf "%s" | fuzzel -d --search "%s" -p "快捷命令: "`, strings.Join(cmdList, "\n"), prefix)
+	} else {
+		cmd = fmt.Sprintf(`printf "%s" | fuzzel -d -p "快捷命令: "`, strings.Join(cmdList, "\n"))
+	}
 	result, err := utils.RunCMD(cmd, false)
-
+	// fmt.Println(cmd, err)
 	if err != nil {
 		return err
 	}
