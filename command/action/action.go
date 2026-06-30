@@ -10,6 +10,7 @@ import (
 
 type ActionReq struct {
 	Name   string `json:"name"`
+	Param   string `json:"param"`
 	Output string `json:"output"`
 	Signal int    `json:"signal"`
 }
@@ -27,10 +28,8 @@ func Action(w http.ResponseWriter, r *http.Request) {
 	switch req.Name {
 	case "get-cur-window":
 		GetCurWindow(w, req)
-	case "system-actions":
-		err = cmdAction.Run("System")
 	case "cmd-actions":
-		err = cmdAction.Run("")
+		err = cmdAction.Run(req.Param)
 	case "next-window":
 		FocusNextWindow()
 	case "select-window":
