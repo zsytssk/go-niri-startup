@@ -28,11 +28,11 @@ func runNiriSh(sh string) error {
 
 func CmdAction() error {
 
-	cmd, err := utils.RunCMD(`printf "Waybar\nTransws\nNiri-startup\n" | fuzzel -d -p "运行快捷命令: "`, false)
+	cmd, err := utils.RunCMD(`printf "Waybar Relaunch\nTransws Relaunch\nNiri-startup Relaunch\n" | fuzzel -d -p "运行快捷命令: "`, false)
 	if err != nil {
 		return err
 	}
-	if cmd == "Niri-startup" {
+	if cmd == "Niri-startup Relaunch" {
 		err = runNiriSh("pkill niri-startup >/dev/null 2>&1 || true; exec niri-startup >> ~/Documents/zsy/github/go-niri-startup/niri-bun.log 2>&1")
 		if err != nil {
 			return err
