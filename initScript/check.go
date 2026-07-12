@@ -32,7 +32,12 @@ func Check(PORT int) (stop bool, err error) {
 	if err != nil {
 		return
 	}
-	if HDMIOutputMake == "Huawei Technologies Co., Inc." {
+	posX, err := utils.GetNestedValueFromStr(outputsStr, "Ok.Outputs.HDMI-A-1.logical.x")
+	if err != nil {
+		return
+	}
+	fmt.Println(`test:>1`, posX, HDMIOutputMake)
+	if HDMIOutputMake == "Huawei Technologies Co., Inc." && posX.(float64) <= 0 {
 		cmdAction.ToggleHdmiOutoutPosition("")
 	}
 

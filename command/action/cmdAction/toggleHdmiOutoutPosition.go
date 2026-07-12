@@ -1,6 +1,7 @@
 package cmdAction
 
 import (
+	"fmt"
 	"niri-startup/action"
 	"niri-startup/utils"
 )
@@ -22,6 +23,7 @@ func ToggleHdmiOutoutPosition(_cmd string) error {
 	if err != nil {
 		return err
 	}
+	fmt.Println(`test:>2`, posX)
 	if posX.(float64) > 0 {
 		utils.NiriSend(
 			map[string]interface{}{

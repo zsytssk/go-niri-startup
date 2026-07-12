@@ -14,7 +14,6 @@ var SystemAction = CmdActionItem {
 	CmdList: []string {
 		"󰌾 Lock System",
 		"󰍃 Logout System",
-		"󰍃 Logout System",
 		"󰙧 Shutdown System",
 		"󰑐 Reboot System",
 		"󰚰 Update System",
