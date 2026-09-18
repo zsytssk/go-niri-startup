@@ -8,7 +8,6 @@ import (
 
 var RelaunchAction = CmdActionItem {
 	CmdList: []string {
-		"Waybar Relaunch",
 		"Transws Relaunch",
 		"Niri-startup Relaunch",
 	},

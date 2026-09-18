@@ -1,3 +1,16 @@
+## 2026-09-17 20:35:23
+
+```
+Mod+L hotkey-overlay-title="noctalia lock" { spawn-sh "noctalia msg session lock"; }
+// Suggested binds for running programs: terminal, app launcher, screen locker.
+Mod+T hotkey-overlay-title="Open a Terminal: alacritty" { spawn "alacritty"; }
+Mod+D hotkey-overlay-title="Run an Application: dmenu" { spawn "printf 'alpha\nbeta\ngamma\n' | noctalia dmenu -p \"Pick\""; }
+```
+
+```
+printf 'alpha\nbeta\ngamma\n' | noctalia dmenu --search "a" -p \"Pick\"
+```
+
 ## 2026-06-29 14:23:30
 
 ```

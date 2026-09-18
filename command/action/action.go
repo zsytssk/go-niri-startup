@@ -26,8 +26,6 @@ func Action(w http.ResponseWriter, r *http.Request) {
 	}
 	// var msg string
 	switch req.Name {
-	case "get-cur-window":
-		GetCurWindow(w, req)
 	case "cmd-actions":
 		err = cmdAction.Run(req.Param)
 	case "next-window":

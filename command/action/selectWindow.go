@@ -61,7 +61,7 @@ func SelectWindow() error {
 	}
 	input := strings.Join(lines, "\n")
 
-	result, err := utils.RunCMD(fmt.Sprintf(`echo "%s" | fuzzel -d -p "请选择: "`, input), false)
+	result, err := utils.RunCMD(fmt.Sprintf(`echo "%s" | noctalia dmenu -p "请选择: "`, input), false)
 	if err != nil {
 		return err
 	}

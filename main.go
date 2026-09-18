@@ -41,7 +41,7 @@ func main() {
 
 	state.GetStateInstance()
 	utils.GetSocketInstance()
-	utils.RunCMD("notify-send 启动 niri-ts-startup!", false)
+	utils.RunCMD("noctalia msg notification-show \"启动 niri-ts-startup!\"", false)
 	http.HandleFunc("/spad", spad.Spad)
 	http.HandleFunc("/action", action.Action)
 	http.HandleFunc("/runApp", command.RunApp)
@@ -53,7 +53,7 @@ func main() {
 	log.Println("启动niri-startup")
 
 	err = http.ListenAndServe(fmt.Sprintf(":%d", PORT), nil)
-	utils.RunCMD("notify-send 退出 niri-ts-startup!", false)
+	utils.RunCMD("noctalia msg notification-show \"退出 niri-ts-startup!\"", false)
 	if err != nil {
 		panic(err)
 	}

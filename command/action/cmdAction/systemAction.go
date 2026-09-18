@@ -7,16 +7,12 @@ import (
 	"niri-startup/utils"
 	"os/exec"
 	"strings"
-	"time"
 )
 
 var SystemAction = CmdActionItem {
 	CmdList: []string {
-		"󰌾 Lock System",
-		"󰍃 Logout System",
-		"󰙧 Shutdown System",
-		"󰑐 Reboot System",
-		"󰚰 Update System",
+		"Update System",
+		"KillWine System",
 	},
 	Fn: SystemActionFn,
 }
@@ -25,40 +21,18 @@ var SystemAction = CmdActionItem {
 func SystemActionFn(cmd string) error {
 	var err error
 	cmd = strings.Replace(cmd, " System", "", 1)
-	if cmd == "󰌾 Lock" {
-		utils.RunCMD("swaylock --daemonize", true)
-		time.Sleep(1 * time.Second)
-		utils.NiriSendAction(action.Action{
-			PowerOffMonitors: &action.Empty{},
-		})
-		return nil
-	}
-	if cmd == "󰍃 Logout" {
-		err = runPowerOption("退出登陆", "niri msg action quit --skip-confirmation")
-		if err != nil {
-			return err
-		}
-		return nil
-	}
-	if cmd == "󰑐 Reboot" {
-		err = runPowerOption("重启", "reboot")
-		if err != nil {
-			return err
-		}
-		return nil
-	}
-	if cmd == "󰙧 Shutdown" {
-		err = runPowerOption("关机", "shutdown -h now")
-		if err != nil {
-			return err
-		}
-		return nil
-	}
-	if cmd == "󰚰 Update" {
+	if cmd == "Update" {
 		err = runGhosttyCmd("update", "Update System", "neofetch && sudo apt update && sudo apt upgrade; exec bash")
 		if err != nil {
 			return err
 		}
+	}
+	if cmd == "KillWine" {
+		err = runPowerOption("KillWine")
+		if err != nil {
+			return err
+		}
+		return nil
 	}
 	return nil
 }
@@ -134,7 +108,7 @@ func runGhosttyCmd(name string, title string, script string) error {
 	return nil
 }
 
-func runPowerOption(name string, cmd string) error {
+func runPowerOption(name string) error {
 	script := fmt.Sprintf(`
 		clear
 
@@ -153,22 +127,8 @@ func runPowerOption(name string, cmd string) error {
 		fi
 
 		echo
-		echo "是否%s? (Y/n)"
-		read -p "> " choice
-
-		choice="${choice:-Y}"
-
-		case "$choice" in
-			Y|y)
-				echo "正在%s..."
-				%s
-				;;
-			*)
-				echo "已取消%s"
-				;;
-		esac
 		exec bash
-	`, name, name, name, cmd, name)
+	`, name)
 
 	err := runGhosttyCmd("clean", "Clean System", script)
 	if err != nil {

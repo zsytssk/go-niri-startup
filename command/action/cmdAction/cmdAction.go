@@ -22,11 +22,7 @@ func Run(prefix string) error {
 		cmdList = append(cmdList, item.CmdList...)
 	}
 	var cmd string
-	if len(prefix) > 0 {
-		cmd = fmt.Sprintf(`printf "%s" | fuzzel -d --search "%s" -p "快捷命令: "`, strings.Join(cmdList, "\n"), prefix)
-	} else {
-		cmd = fmt.Sprintf(`printf "%s" | fuzzel -d -p "快捷命令: "`, strings.Join(cmdList, "\n"))
-	}
+	cmd = fmt.Sprintf(`printf "%s" | noctalia dmenu -p "快捷命令: "`, strings.Join(cmdList, "\n"))
 	result, err := utils.RunCMD(cmd, false)
 	// fmt.Println(cmd, err)
 	if err != nil {
